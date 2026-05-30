@@ -12,6 +12,18 @@ datasource db {
   provider = "sqlite"
 }
 
+model GameSession {
+  id         String   @id @default(uuid())
+  role       String   // 'Camp Leader', 'Resource Manager', etc.
+  day        Int      @default(1)
+  supplies   Int      @default(60)
+  safety     Int      @default(50)
+  population Int      @default(70)
+  morale     Int      @default(65)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 model User {
   id             Int      @id @default(autoincrement())
   email          String   @unique
