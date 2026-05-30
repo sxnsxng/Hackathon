@@ -14,9 +14,9 @@ function LeaderBoardRow({ entry, rank }: Props) {
         alignItems: "center",
         background: "linear-gradient(90deg, rgba(80, 80, 80, 0.4) 0%, rgba(50, 50, 50, 0.25) 100%)",
         borderRadius: "0px 6px 6px 0px",
-        padding: "22px 28px",
+        padding: "15px 20px",
         color: "#fffff",
-        fontSize: "21px",
+        fontSize: "16px",
         fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         letterSpacing: "0.5px",
       }}
