@@ -32,7 +32,18 @@ export default function EndingGalleryPage({
   onDelete,
 }: EndingGalleryPageProps) {
   const [selected, setSelected] = useState<EndingData | null>(null);
-  const [boardMap, setBoardMap] = useState<Record<string, BoardNode[]>>({});
+  const [boardMap, setBoardMap] = useState<Record<string, BoardNode[]>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("endingBoardMap") ?? "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  const saveBoardMap = (next: Record<string, BoardNode[]>) => {
+    setBoardMap(next);
+    localStorage.setItem("endingBoardMap", JSON.stringify(next));
+  };
 
   const handleDelete = async () => {
     if (!selected || !userId) return;
@@ -50,19 +61,13 @@ export default function EndingGalleryPage({
   const handleAddNode = (label: string) => {
     if (!selected) return;
     const id = selected.id;
-    setBoardMap((prev) => ({
-      ...prev,
-      [id]: [...(prev[id] ?? []), { id: `n${Date.now()}`, label, createdAt: new Date().toISOString() }],
-    }));
+    saveBoardMap({ ...boardMap, [id]: [...(boardMap[id] ?? []), { id: `n${Date.now()}`, label, createdAt: new Date().toISOString() }] });
   };
 
   const handleDeleteNode = (nodeId: string) => {
     if (!selected) return;
     const id = selected.id;
-    setBoardMap((prev) => ({
-      ...prev,
-      [id]: (prev[id] ?? []).filter((n) => n.id !== nodeId),
-    }));
+    saveBoardMap({ ...boardMap, [id]: (boardMap[id] ?? []).filter((n: BoardNode) => n.id !== nodeId) });
   };
 
   return (
@@ -75,14 +80,6 @@ export default function EndingGalleryPage({
         {/* Title bar */}
         <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
           <div className="flex items-center gap-3">
-            {selected && (
-              <button
-                onClick={() => setSelected(null)}
-                className="text-[#8A8A8A] hover:text-white font-mono text-sm transition-colors"
-              >
-                ← Back
-              </button>
-            )}
             <span className="text-white font-mono text-xl font-bold tracking-wide">
               {selected ? selected.nameEn.toUpperCase() : "ENDING GALLERY"}
             </span>
