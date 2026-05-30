@@ -25,40 +25,31 @@ model GameSession {
 }
 
 model User {
-  id           Int          @id @default(autoincrement())
-  email        String       @unique
-  username     String       @unique
-  password     String       // hashed
-  totalPoint   Int          @default(0)  // บวกทุกครั้งหลังเล่นจบ
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  username       String   @unique
+  password       String
+  profilePicture String?
+  createdAt      DateTime @default(now())
+  achievements   UserAchievement[]
 
-  gameRecords  GameRecord[]
 }
 
-// ── GameRecord — บันทึกทุกครั้งที่เล่นจบ ─────────────────────────────────────
-
-model GameRecord {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  endingId    String   // เช่น "new_dawn", "ghost_camp"
-  endingName  String   // เช่น "The New Dawn"
-  isSuccess   Boolean
-  score       Int      // score จาก game นั้น (นำไปบวก totalPoint)
-  roleId      String   // เช่น "food-manager"
-  playedAt    DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id])
+model Achievement {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String
+  icon        String?
+  users       UserAchievement[]
 }
 
-model GameSessionRecord {
-  id         String   @id @default(uuid())
-  role       String   
-  day        Int      @default(1)
-  supplies   Int      @default(60)
-  safety     Int      @default(50)
-  population Int      @default(70)
-  morale     Int      @default(65)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
 }

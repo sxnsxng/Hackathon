@@ -1,2 +1,9 @@
 @import "tailwindcss";
- 
+@import url('https://googleapis.com');
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background-color: #000;
+  color: white;
+}

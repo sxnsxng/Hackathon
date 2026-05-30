@@ -1,1 +1,6 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@400;700&display=swap');
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
