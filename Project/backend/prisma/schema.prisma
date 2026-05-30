@@ -19,5 +19,25 @@ model User {
   password       String
   profilePicture String?
   createdAt      DateTime @default(now())
+  achievements   UserAchievement[]
 
+}
+
+model Achievement {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String
+  icon        String?
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
 }
