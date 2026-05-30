@@ -169,7 +169,7 @@ export default function EndingGalleryPage({
           </span>
           <button
             onClick={onClose}
-            className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors pr-4"
+            className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors "
           >
             ✕
           </button>
@@ -190,7 +190,7 @@ export default function EndingGalleryPage({
             />
 
             {/* Ending Board section */}
-            <div className="border-t border-[#8a8a8a] px-10 py-6">
+            <div className=" border-[#8a8a8a] px-10 py-8">
               <p className="text-white font-mono font-bold text-sm tracking-[0.14em] uppercase mb-4">
                 ENDING BOARD
               </p>
