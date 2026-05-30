@@ -37,8 +37,8 @@ export default function LeaderBoardPage({ onClose }: Props) {
         WebkitBackdropFilter: "blur(16px)",
         borderRadius: 14,
         border: "1px solid rgba(255, 255, 255, 0.08)",
-        width: 530,
-        padding: "48px 40px 40px",
+        width: 380,
+        padding: "32px 28px 28px",
         position: "relative",
         boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
       }}
@@ -70,7 +70,7 @@ export default function LeaderBoardPage({ onClose }: Props) {
       <h2
         style={{
           color: "#fff",
-          fontSize: "42px",
+          fontSize: "28px",
           fontWeight: 300,
           textAlign: "center",
           margin: "0 0 16px",
