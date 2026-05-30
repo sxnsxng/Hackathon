@@ -160,11 +160,11 @@ export default function EndingGalleryPage({
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: "center" }}
     >
-      <div className="relative z-10 w-[75%] h-[90%] bg-[#000000]/85 border border-[#8A8A8A] rounded-xl flex flex-col overflow-hidden shadow-2xl">
+      <div className="relative z-10 w-[95%] h-[95%] md:w-[80%] md:h-[90%] bg-[#000000]/85 border border-[#8A8A8A] rounded-xl flex flex-col overflow-hidden shadow-2xl">
 
         {/* Title bar */}
-        <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
-          <span className="text-white font-mono text-xl font-bold tracking-wide">
+        <div className="flex items-center justify-between px-4 md:px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
+          <span className="text-white font-mono text-sm md:text-xl font-bold tracking-wide">
             {selected ? selected.nameEn.toUpperCase() : "ENDING GALLERY"}
           </span>
           <button
@@ -190,8 +190,8 @@ export default function EndingGalleryPage({
             />
 
             {/* Ending Board section */}
-            <div className=" border-[#8a8a8a] px-10 py-8">
-              <p className="text-white font-mono font-bold text-sm tracking-[0.14em] uppercase mb-4">
+            <div className="border-[#8a8a8a] px-4 md:px-10 py-4 md:py-8">
+              <p className="text-white font-mono font-bold text-xs md:text-sm tracking-[0.14em] uppercase mb-3 md:mb-4">
                 ENDING BOARD
               </p>
               <EndingBoard
@@ -220,13 +220,13 @@ export default function EndingGalleryPage({
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-8 py-6
+          <div className="flex-1 overflow-y-auto px-4 md:px-8 py-4 md:py-6
             [&::-webkit-scrollbar]:w-1
             [&::-webkit-scrollbar-track]:bg-transparent
             [&::-webkit-scrollbar-thumb]:bg-transparent
             hover:[&::-webkit-scrollbar-thumb]:bg-[#696969]"
           >
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
               {ALL_ENDINGS.map((ending) => (
                 <GalleryCard
                   key={ending.id}

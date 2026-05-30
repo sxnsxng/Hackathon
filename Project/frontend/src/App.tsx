@@ -55,7 +55,7 @@ function App() {
       </div>
 
       {/* Bottom left: gallery + leaderboard icons */}
-      <div className="absolute bottom-6 left-6 flex gap-5 items-center">
+      <div className="absolute bottom-10 left-15 flex gap-10 items-center">
         <button
           onClick={openGallery}
           title="Ending Gallery"

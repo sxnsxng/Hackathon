@@ -211,7 +211,7 @@ export default function EndingBoard({
       <div
         ref={boardRef}
         onClick={handleBoardClick}
-        className="w-[70vw] h-[50vh] relative overflow-hidden border border-white/10 rounded-2xl cursor-default select-none"
+        className="w-full h-[40vh] md:h-[50vh] relative overflow-hidden border border-white/10 rounded-2xl cursor-default select-none"
         style={{
           backgroundImage: `
             radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.025) 0%, transparent 70%),

@@ -81,7 +81,7 @@ const Gameplay: React.FC = () => {
       <div className="relative z-10 w-[75%] h-[90%] bg-[#000000]/85 border border-[#8A8A8A] rounded-xl flex flex-col overflow-hidden shadow-2xl">
 
         {/* Title bar */}
-        <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
+        <div className="flex items-center justify-between px-4 md:px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
           <div className="flex items-center gap-4">
             <span className="text-white font-mono text-xl font-bold tracking-wide">
               DAYS {day} — {role.lines.join(" ")}
@@ -99,32 +99,32 @@ const Gameplay: React.FC = () => {
         </div>
 
         {/* Body */}
-        <div className="flex flex-col gap-4 px-8 py-6 flex-1 overflow-y-auto
+        <div className="flex flex-col gap-4 px-4 md:px-8 py-4 md:py-6 flex-1 overflow-y-auto
           [&::-webkit-scrollbar]:w-1
           [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-transparent
           hover:[&::-webkit-scrollbar-thumb]:bg-[#696969]"
         >
-          {/* Question + Status */}
-          <div className="flex gap-4">
-            <div className="flex-1 border border-[#8A8A8A] rounded-xl px-6 py-5 flex items-center min-h-[160px]">
-              {question ? (
-                <p className="text-white font-mono font-bold text-sm tracking-wide uppercase leading-relaxed">
-                  {question.scenario}
-                </p>
-              ) : (
-                <p className="text-[#555] font-mono text-sm italic">No question found for day {day}.</p>
-              )}
-            </div>
-
-            <div className="w-56 shrink-0 border border-[#8A8A8A] rounded-xl px-6 py-5">
-              <p className="text-white font-mono font-bold text-xs tracking-[0.15em] uppercase mb-4">
-                CURRENT STATUS
+          {/* Question */}
+          <div className="border border-[#8A8A8A] rounded-xl px-6 py-5 flex items-center min-h-30">
+            {question ? (
+              <p className="text-white font-mono font-bold text-sm tracking-wide uppercase leading-relaxed">
+                {question.scenario}
               </p>
-              <div className="flex flex-col gap-3">
+            ) : (
+              <p className="text-[#555] font-mono text-sm italic">No question found for day {day}.</p>
+            )}
+          </div>
+
+          {/* Status */}
+          <div className="border border-[#8A8A8A] rounded-xl px-4 py-3">
+            <p className="text-white font-mono font-bold text-xs tracking-[0.15em] uppercase mb-3">
+              CURRENT STATUS
+            </p>
+            <div className="grid grid-cols-4 gap-2">
                 {(["supplies", "safety", "population", "morale"] as const).map((key) => (
-                  <div key={key} className="flex items-center justify-between">
-                    <span className="text-white font-mono text-xs tracking-widest uppercase">
+                  <div key={key} className="flex flex-col items-center gap-0.5">
+                    <span className="text-[#8A8A8A] font-mono text-[9px] tracking-widest uppercase text-center">
                       {key === "supplies" ? "FOOD" : key === "population" ? "PEOPLE" : key.toUpperCase()}
                     </span>
                     <span className={`font-mono font-bold text-sm tabular-nums ${stats[key] <= 10 ? "text-red-400" : "text-white"}`}>
@@ -132,7 +132,6 @@ const Gameplay: React.FC = () => {
                     </span>
                   </div>
                 ))}
-              </div>
             </div>
           </div>
 
@@ -165,7 +164,7 @@ const Gameplay: React.FC = () => {
             <div className="flex justify-end mt-2">
               <button
                 onClick={handleNext}
-                className="font-mono font-bold text-sm tracking-[0.14em] uppercase px-8 py-3 rounded-xl text-neutral-950 bg-gradient-to-br from-amber-600 to-amber-400 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
+                className="font-mono font-bold text-sm tracking-[0.14em] uppercase px-8 py-3 rounded-xl text-neutral-950 bg-linear-to-br from-amber-600 to-amber-400 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
               >
                 {day >= 7 ? "See Ending →" : `Day ${day + 1} →`}
               </button>

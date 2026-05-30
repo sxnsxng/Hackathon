@@ -44,7 +44,7 @@ const Register: React.FC = () => {
             className="flex h-screen w-screen overflow-hidden items-center justify-start"
             style={{ backgroundImage: "url('/BG1.png')", backgroundSize: "cover", backgroundPosition: "center" }}
         >
-            <div className="w-[700px] min-w-[340px] h-full flex flex-col justify-center px-10 gap-6">
+            <div className="w-175 min-w-85 h-full flex flex-col justify-center px-10 gap-6">
 
                 <h1 className="font-jura text-white text-[5vw] font-normal m-0">
                     7 Days to Survive
@@ -83,7 +83,7 @@ const Register: React.FC = () => {
 
                 <button
                     onClick={handleSignUp}
-                    className="w-1/2 py-3 bg-white text-black font-bold text-[15px] border-0 rounded-[15px] cursor-pointer font-jura hover:bg-[#ccc] transition-colors"
+                    className="w-full md:w-1/2 py-3 bg-white text-black font-bold text-[15px] border-0 rounded-[15px] cursor-pointer font-jura hover:bg-[#ccc] transition-colors"
                 >
                     Sign Up
                 </button>
