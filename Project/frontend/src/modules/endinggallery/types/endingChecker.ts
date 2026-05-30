@@ -168,21 +168,57 @@ const SUCCESS_ORDER = [
   "sustainable_haven",
 ]
 
+// ── Map condition IDs → endings.data.ts IDs ──────────────────────────────────
+
+const TO_ENDING_ID: Record<string, string> = {
+  // success
+  new_dawn:                "new_dawn",
+  sustainable_haven:       "quiet_refuge",
+  fog_merchants:           "the_wanderers",
+  contented_fortress:      "iron_citadel",
+  iron_garrison:           "iron_citadel",
+  isolated_sanctuary:      "quiet_refuge",
+  megacity_of_hope:        "fallen_saint",
+  crowded_sanctuary:       "peoples_republic",
+  cult_of_mist:            "peoples_republic",
+  optimistic_nomads:       "the_wanderers",
+  benevolent_dictatorship: "iron_citadel",
+  democratic_oasis:        "peoples_republic",
+  eco_survivors:           "eco_survivors",
+  lone_overseer:           "last_guardian",
+  // fail
+  starvation_graveyard:    "starving_ground",
+  cannibalistic_feast:     "final_feast",
+  breached_wall:           "fallen_wall",
+  swallowed_by_fog:        "fallen_wall",
+  ghost_camp:              "empty_camp",
+  great_exodus:            "empty_camp",
+  mass_despair:            "broken_spirit",
+  bloody_mutiny:           "red_revolt",
+  total_anarchy:           "the_abyss",
+  fogs_plague:             "the_plague",
+  ultimate_betrayal:       "red_revolt",
+  engineers_overreach:     "broken_spirit",
+  politicians_promises:    "the_abyss",
+  medics_mercy:            "the_plague",
+}
+
 // ── Main export ───────────────────────────────────────────────────────────────
 
-
 export function resolveEnding(stats: GameStats, survived: boolean): string {
+  let conditionId: string
   if (!survived) {
+    conditionId = "ghost_camp"
     for (const id of FAIL_ORDER) {
-      if (CONDITIONS[id]?.(stats)) return id
+      if (CONDITIONS[id]?.(stats)) { conditionId = id; break }
     }
-    // default fail
-    return "ghost_camp"
+  } else {
+    conditionId = "sustainable_haven"
+    for (const id of SUCCESS_ORDER) {
+      if (CONDITIONS[id]?.(stats)) { conditionId = id; break }
+    }
   }
-  for (const id of SUCCESS_ORDER) {
-    if (CONDITIONS[id]?.(stats)) return id
-  }
-  return "sustainable_haven"
+  return TO_ENDING_ID[conditionId] ?? conditionId
 }
 
 
