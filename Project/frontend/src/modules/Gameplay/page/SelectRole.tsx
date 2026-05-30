@@ -19,9 +19,27 @@ const SelectRole: React.FC = () => {
 
   const activeRole: Role | undefined = roles.find((r) => r.id === selected)
 
-  const handleConfirm = () => {
+  // ✅ แก้ handleConfirm เป็น async เพื่อเรียก API สร้าง Session ก่อน
+  const handleConfirm = async () => {
     if (!activeRole) return
-    startGame(activeRole)
+
+    try {
+      // CREATE session → ได้ sessionId กลับมา
+      const res = await fetch("/api/game/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: activeRole.id }),
+      })
+      const data = await res.json()
+      const sessionId: string = data.session.id
+
+      // ส่ง sessionId เข้า store
+      startGame(activeRole, sessionId)
+    } catch {
+      // ถ้า API ล้มเหลว ให้ใช้ id ชั่วคราวแทน
+      startGame(activeRole, crypto.randomUUID())
+    }
+
     navigate("/Gameplay")
   }
 

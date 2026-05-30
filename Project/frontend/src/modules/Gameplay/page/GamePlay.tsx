@@ -19,15 +19,15 @@ const QUESTION_MAP: Record<string, Question[]> = {
 
 const Gameplay: React.FC = () => {
   const navigate = useNavigate()
-  const { role, day, score, stats, applyChoice, nextDay, isGameOver } = useGameStore()
+  const { role, day, score, stats, sessionId, applyChoice, nextDay, isGameOver, resetGame } = useGameStore()
   const [chosen, setChosen] = useState<string | null>(null)
 
+  // ✅ กรณี refresh หน้า — role หาย → กลับไปเลือก role ใหม่
   if (!role) {
     navigate("/SelectRole")
     return null
   }
 
-  // ถ้า game over (stat = 0) → ไป Result ทันที
   if (isGameOver) {
     navigate("/Result")
     return null
@@ -51,6 +51,28 @@ const Gameplay: React.FC = () => {
     }
   }
 
+  // ✅ DELETE session + จัดการ error ทุกกรณี
+  const handleClose = async () => {
+    if (sessionId) {
+      try {
+        const res = await fetch(`/api/game/session/${sessionId}`, {
+          method: "DELETE",
+        })
+
+        if (!res.ok) {
+          // session ไม่มีใน DB แล้ว (เช่น refresh มาก่อน) → ไม่ต้อง block
+          console.warn("[handleClose] session not found or already deleted")
+        }
+      } catch (err) {
+        // network error → ไม่ block การออก
+        console.error("[handleClose] failed to delete session:", err)
+      }
+    }
+
+    resetGame()   // ล้าง state ทั้งหมด
+    navigate("/")
+  }
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
@@ -69,7 +91,7 @@ const Gameplay: React.FC = () => {
             </span>
           </div>
           <button
-            onClick={() => navigate("/")}
+            onClick={handleClose}
             className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors pr-4"
           >
             ✕

@@ -11,6 +11,7 @@ export type Stats = {
 
 export type GameStore = {
   role: Role | null
+  sessionId: string | null
   day: number
   score: number
   lifetimeTotalScore: number
@@ -18,7 +19,7 @@ export type GameStore = {
   isGameOver: boolean
   endingType: "success" | "fail" | null
 
-  startGame: (role: Role) => void
+  startGame: (role: Role, sessionId: string) => void  // ✅ เพิ่ม sessionId
   applyChoice: (delta: StatDelta, scoreGain: number) => void
   nextDay: () => void
   addToLifetimeScore: (points: number) => void
@@ -34,6 +35,7 @@ const INITIAL_STATS: Stats = {
 
 export const useGameStore = create<GameStore>((set, get) => ({
   role: null,
+  sessionId: null,
   day: 1,
   score: 0,
   lifetimeTotalScore: 0,
@@ -41,8 +43,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isGameOver: false,
   endingType: null,
 
-  startGame: (role) =>
-    set({ role, day: 1, score: 0, stats: INITIAL_STATS, isGameOver: false, endingType: null }),
+  startGame: (role, sessionId) =>   // ✅ แก้ชื่อ + เพิ่ม sessionId
+    set({ role, sessionId, day: 1, score: 0, stats: INITIAL_STATS, isGameOver: false, endingType: null }),
 
   addToLifetimeScore: (points) =>
     set((state) => ({ lifetimeTotalScore: state.lifetimeTotalScore + points })),
@@ -74,5 +76,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   resetGame: () =>
-    set({ role: null, day: 1, score: 0, stats: INITIAL_STATS, isGameOver: false, endingType: null }),
+    set({ role: null, sessionId: null, day: 1, score: 0, stats: INITIAL_STATS, isGameOver: false, endingType: null }),
+    //                ↑ ✅ เพิ่ม reset sessionId
 }))

@@ -5,10 +5,8 @@ import type { SaveEndingInput } from "../schemas/GamePlay.schemas.js"
 
 /**
  * บันทึก game record และบวก score เข้า totalPoint ของ user
- * ทำใน transaction เดียวกันเพื่อความ consistent
  */
 export async function saveEndingAndUpdatePoint(data: SaveEndingInput) {
-  // 1. สร้าง GameRecord (ไม่ต้องอยู่ใน transaction กับ user update)
   const gameRecord = await prisma.gameRecord.create({
     data: {
       userId:     data.userId,
@@ -21,7 +19,6 @@ export async function saveEndingAndUpdatePoint(data: SaveEndingInput) {
     },
   })
 
-  // 2. บวก score เข้า totalPoint ของ user (ถ้า user ไม่มีอยู่ก็ข้ามไป)
   let updatedTotalPoint: number | null = null
   try {
     const updatedUser = await prisma.user.update({
@@ -31,7 +28,7 @@ export async function saveEndingAndUpdatePoint(data: SaveEndingInput) {
     })
     updatedTotalPoint = updatedUser.totalPoint
   } catch {
-    // user ไม่มีใน DB — บันทึก record ได้แต่ไม่ update point
+    // user ไม่มีใน DB
   }
 
   return { gameRecord, updatedTotalPoint }
@@ -48,7 +45,7 @@ export async function getGameHistoryByUser(userId: number) {
 }
 
 /**
- * ดึง leaderboard — top users by totalPoint
+ * ดึง leaderboard
  */
 export async function getLeaderboard(limit = 10) {
   return await prisma.user.findMany({
@@ -59,5 +56,15 @@ export async function getLeaderboard(limit = 10) {
       username: true,
       totalPoint: true,
     },
+  })
+}
+
+/**
+ * ✅ ลบ Game Session (เมื่อกด ✕ ออกกลางคัน)
+ * โยน error P2025 ถ้า session ไม่มีใน DB
+ */
+export async function deleteGameSession(id: string) {
+  return await prisma.gameSession.delete({
+    where: { id },
   })
 }
