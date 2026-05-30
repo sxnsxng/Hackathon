@@ -1,19 +1,19 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
 import { useGameStore } from "../data/GameStore"
-import { resolveEnding } from "../data/Ending/resolveEnding"
-import { ALL_ENDINGS } from "../data/Ending/endings"
+import { resolveEnding } from "../../endinggallery/types/endingChecker"
+import { ALL_ENDINGS } from "../../endinggallery/data/endings.data"
 import bg from "../../../assets/BG.png"
+
+const API = "http://localhost:3000"
 
 const Result: React.FC = () => {
   const navigate = useNavigate()
-  const { stats, score, resetGame, addToLifetimeScore } = useGameStore()
+  const { stats, score, role, resetGame, addToLifetimeScore } = useGameStore()
 
-  // คำนวณ bonus score จาก stats ที่เหลือ
   const statBonus = stats.supplies + stats.safety + stats.population + stats.morale
   const totalScore = score + statBonus
 
-  // Map stats → GameStats format ที่ resolveEnding ต้องการ
   const gameStats = {
     food:   stats.supplies,
     safety: stats.safety,
@@ -26,18 +26,26 @@ const Result: React.FC = () => {
   const ending    = ALL_ENDINGS.find((e) => e.id === endingId) ?? ALL_ENDINGS[0]
 
   const handleSaveEnding = async () => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}")
+    if (!currentUser.id) {
+      alert("Please log in to save your ending.")
+      return
+    }
     try {
-      await fetch("/api/endings", {
+      const res = await fetch(`${API}/api/gameplay/ending`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          endingId:    ending.id,
-          endingName:  ending.nameEn,
-          isSuccess:   ending.isSuccess,
-          score:       totalScore,
-          playedAt:    new Date().toISOString(),
+          userId:    currentUser.id,
+          endingId:  ending.id,
+          endingName: ending.nameEn,
+          isSuccess: ending.isSuccess,
+          score:     totalScore,
+          roleId:    role?.id ?? "unknown",
+          playedAt:  new Date().toISOString(),
         }),
       })
+      if (!res.ok) throw new Error("Server error")
       alert("Ending saved!")
     } catch {
       alert("Failed to save ending.")
@@ -59,11 +67,9 @@ const Result: React.FC = () => {
 
         {/* Title bar */}
         <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
-          <div className="flex items-center gap-4">
-            <span className="text-white font-mono text-xl font-bold tracking-wide uppercase">
-              {ending.isSuccess ? "SUCCESS!! YOU CAN SURVIVE" : "NOT SUCCESS?! YOU CAN'T SURVIVE"}
-            </span>
-          </div>
+          <span className="text-white font-mono text-xl font-bold tracking-wide uppercase">
+            {ending.isSuccess ? "SUCCESS!! YOU CAN SURVIVE" : "NOT SUCCESS?! YOU CAN'T SURVIVE"}
+          </span>
           <button
             onClick={handleClose}
             className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors pr-4"

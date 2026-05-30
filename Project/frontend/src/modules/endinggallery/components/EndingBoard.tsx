@@ -65,7 +65,7 @@ export default function EndingBoard({ nodes, onAdd, onDelete }: Props) {
         translateX: [0, 16],
         duration:   240,
         ease:       "inQuad",
-      }).finished;
+      });
     }
     onDelete(id);
   };

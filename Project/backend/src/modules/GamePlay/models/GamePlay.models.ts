@@ -8,32 +8,33 @@ import type { SaveEndingInput } from "../schemas/GamePlay.schemas.js"
  * ทำใน transaction เดียวกันเพื่อความ consistent
  */
 export async function saveEndingAndUpdatePoint(data: SaveEndingInput) {
-  return await prisma.$transaction(async (tx) => {
+  // 1. สร้าง GameRecord (ไม่ต้องอยู่ใน transaction กับ user update)
+  const gameRecord = await prisma.gameRecord.create({
+    data: {
+      userId:     data.userId,
+      endingId:   data.endingId,
+      endingName: data.endingName,
+      isSuccess:  data.isSuccess,
+      score:      data.score,
+      roleId:     data.roleId,
+      playedAt:   data.playedAt ? new Date(data.playedAt) : new Date(),
+    },
+  })
 
-    // 1. สร้าง GameRecord
-    const gameRecord = await tx.gameRecord.create({
-      data: {
-        userId:     data.userId,
-        endingId:   data.endingId,
-        endingName: data.endingName,
-        isSuccess:  data.isSuccess,
-        score:      data.score,
-        roleId:     data.roleId,
-        playedAt:   data.playedAt ? new Date(data.playedAt) : new Date(),
-      },
-    })
-
-    // 2. บวก score เข้า totalPoint ของ user
-    const updatedUser = await tx.user.update({
+  // 2. บวก score เข้า totalPoint ของ user (ถ้า user ไม่มีอยู่ก็ข้ามไป)
+  let updatedTotalPoint: number | null = null
+  try {
+    const updatedUser = await prisma.user.update({
       where: { id: data.userId },
-      data: {
-        totalPoint: { increment: data.score },
-      },
+      data: { totalPoint: { increment: data.score } },
       select: { totalPoint: true },
     })
+    updatedTotalPoint = updatedUser.totalPoint
+  } catch {
+    // user ไม่มีใน DB — บันทึก record ได้แต่ไม่ update point
+  }
 
-    return { gameRecord, updatedTotalPoint: updatedUser.totalPoint }
-  })
+  return { gameRecord, updatedTotalPoint }
 }
 
 /**

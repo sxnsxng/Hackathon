@@ -12,11 +12,12 @@
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
     "@tailwindcss/vite": "^4.3.0",
+    "animejs": "^4.4.1",
     "axios": "^1.16.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.76.1",
-    "react-router-dom": "^7.15.1",
+    "react-router-dom": "^7.16.0",
     "tailwindcss": "^4.3.0",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
