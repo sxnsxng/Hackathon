@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../../../lib/prisma.js';
 import { CreateSessionSchema } from '../schemas/GamePlay.schemas.js';
+import { saveEnding, getHistory, leaderboard } from '../controllers/Gameplay.controller.js';
 
 const router = Router();
 
@@ -42,5 +43,14 @@ router.post('/start', async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// POST /api/gameplay/ending — บันทึก ending + บวก totalPoint
+router.post('/ending', saveEnding);
+
+// GET /api/gameplay/history/:userId — ประวัติการเล่นของ user
+router.get('/history/:userId', getHistory);
+
+// GET /api/gameplay/leaderboard — top users by totalPoint
+router.get('/leaderboard', leaderboard);
 
 export default router;

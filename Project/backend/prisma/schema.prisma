@@ -30,9 +30,9 @@ model User {
   username       String   @unique
   password       String
   profilePicture String?
+  totalPoint     Int      @default(0)
   createdAt      DateTime @default(now())
   achievements   UserAchievement[]
-
 }
 
 model Achievement {
@@ -52,4 +52,47 @@ model UserAchievement {
   achievement   Achievement @relation(fields: [achievementId], references: [id])
 
   @@unique([userId, achievementId])
+}
+
+model GameRecord {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  endingId    String
+  endingName  String
+  isSuccess   Boolean
+  score       Int
+  roleId      String
+  playedAt    DateTime @default(now())
+}
+
+model GameSessionRecord {
+  id         String   @id @default(uuid())
+  role       String   
+  day        Int      @default(1)
+  supplies   Int      @default(60)
+  safety     Int      @default(50)
+  population Int      @default(70)
+  morale     Int      @default(65)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model UnlockedEnding {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  endingId   String
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, endingId])
+}
+
+model LeaderboardEntry {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  username   String
+  score      Int
+  role       String
+  dayReached Int
+  ending     String
+  createdAt  DateTime @default(now())
 }
