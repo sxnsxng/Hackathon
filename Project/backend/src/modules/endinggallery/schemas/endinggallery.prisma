@@ -1,0 +1,8 @@
+model UnlockedEnding {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  endingId   String
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, endingId])
+}

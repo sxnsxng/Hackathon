@@ -1,19 +1,29 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
 import { useGameStore } from "../data/GameStore"
-import { resolveEnding } from "../data/Ending/resolveEnding"
-import { ALL_ENDINGS } from "../data/Ending/endings"
+import { resolveEnding } from "../../endinggallery/types/endingChecker"
+import { ALL_ENDINGS } from "../../endinggallery/data/endings.data"
+import { unlockEnding } from "../../endinggallery/api/endinggalleryapi"
 import bg from "../../../assets/BG.png"
+
+const imageModules = import.meta.glob(
+  "../../../assets/endinggallery/*",
+  { eager: true }
+) as Record<string, { default: string }>
+
+const galleryImages: Record<string, string> = {}
+for (const path in imageModules) {
+  const filename = path.split("/").pop()!
+  galleryImages[filename] = imageModules[path].default
+}
 
 const Result: React.FC = () => {
   const navigate = useNavigate()
-  const { stats, score, resetGame, addToLifetimeScore } = useGameStore()
+  const { stats, score, role, resetGame, addToLifetimeScore } = useGameStore()
 
-  // คำนวณ bonus score จาก stats ที่เหลือ
   const statBonus = stats.supplies + stats.safety + stats.population + stats.morale
   const totalScore = score + statBonus
 
-  // Map stats → GameStats format ที่ resolveEnding ต้องการ
   const gameStats = {
     food:   stats.supplies,
     safety: stats.safety,
@@ -25,23 +35,34 @@ const Result: React.FC = () => {
   const endingId  = resolveEnding(gameStats, survived)
   const ending    = ALL_ENDINGS.find((e) => e.id === endingId) ?? ALL_ENDINGS[0]
 
-  const handleSaveEnding = async () => {
+  const handleSaveAndReturn = async () => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}")
+    if (!currentUser.id) {
+      alert("Please log in to save your ending.")
+      return
+    }
     try {
-      await fetch("/api/endings", {
+      const res = await fetch("/api/gameplay/ending", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          endingId:    ending.id,
-          endingName:  ending.nameEn,
-          isSuccess:   ending.isSuccess,
-          score:       totalScore,
-          playedAt:    new Date().toISOString(),
+          userId:    currentUser.id,
+          endingId:  ending.id,
+          endingName: ending.nameEn,
+          isSuccess: ending.isSuccess,
+          score:     totalScore,
+          roleId:    role?.id ?? "unknown",
+          playedAt:  new Date().toISOString(),
         }),
       })
-      alert("Ending saved!")
+      if (!res.ok) throw new Error("Server error")
+      await unlockEnding(String(currentUser.id), ending.id)
     } catch {
-      alert("Failed to save ending.")
+      // ไม่ block การกลับหน้าแรก แม้ save ไม่สำเร็จ
     }
+    addToLifetimeScore(totalScore)
+    resetGame()
+    navigate("/")
   }
 
   const handleClose = () => {
@@ -59,11 +80,9 @@ const Result: React.FC = () => {
 
         {/* Title bar */}
         <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
-          <div className="flex items-center gap-4">
-            <span className="text-white font-mono text-xl font-bold tracking-wide uppercase">
-              {ending.isSuccess ? "SUCCESS!! YOU CAN SURVIVE" : "NOT SUCCESS?! YOU CAN'T SURVIVE"}
-            </span>
-          </div>
+          <span className="text-white font-mono text-xl font-bold tracking-wide uppercase">
+            {ending.isSuccess ? "SUCCESS!! YOU CAN SURVIVE" : "NOT SUCCESS?! YOU CAN'T SURVIVE"}
+          </span>
           <button
             onClick={handleClose}
             className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors pr-4"
@@ -76,16 +95,15 @@ const Result: React.FC = () => {
         <div className="flex flex-col items-center gap-5 px-8 py-6">
 
           {/* Ending image */}
-          <div className="w-full max-w-lg rounded-xl overflow-hidden border border-[#8A8A8A]">
-            <img
-              src={`/src/modules/Gameplay/assets/endings/${ending.imageFile}`}
-              alt={ending.nameEn}
-              className="w-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none"
-              }}
-            />
-          </div>
+          {galleryImages[ending.imageFile] && (
+            <div className="rounded-xl overflow-hidden border border-[#8A8A8A]" style={{ width: 320, height: 220, flexShrink: 0 }}>
+              <img
+                src={galleryImages[ending.imageFile]}
+                alt={ending.nameEn}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </div>
+          )}
 
           {/* Ending name */}
           <p className="text-white font-mono font-bold text-xl tracking-[0.2em] uppercase text-center">
@@ -109,20 +127,24 @@ const Result: React.FC = () => {
                 </span>
               </div>
             ))}
-            <div className="flex flex-col items-center gap-1 border-l border-[#8A8A8A] pl-6">
-              <span className="text-[#8A8A8A] font-mono text-[10px] tracking-widest uppercase">TOTAL SCORE</span>
-              <span className="font-mono font-bold text-lg text-amber-400">{totalScore} PT</span>
-            </div>
-          </div>
+            <div className="flex flex-col items-center gap-1 border-l border-[#8A8A8A] pl-6 min-w-[120px]">
+              <span className="text-[#8A8A8A] font-mono text-[10px] tracking-widest uppercase whitespace-nowrap">
+                TOTAL SCORE
+              </span>
 
-          {/* Save Ending button */}
-          <div className="flex justify-end w-full pb-2">
-            <button
-              onClick={handleSaveEnding}
-              className="font-mono font-bold text-sm tracking-wide px-6 py-2 rounded-xl bg-white text-black hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Save Ending
-            </button>
+              <span className="font-mono font-bold text-lg text-amber-400 whitespace-nowrap">
+                {totalScore} PT
+              </span>
+            </div>
+            {/* Save Ending button */}
+            <div className="flex justify-end w-full pb-2">
+              <button
+                onClick={handleSaveAndReturn}
+                className="font-mono font-bold text-sm tracking-wide px-6 py-2 rounded-xl bg-white text-black hover:-translate-y-0.5 transition-all duration-200"
+              >
+                Save Ending
+              </button>
+            </div>
           </div>
         </div>
       </div>

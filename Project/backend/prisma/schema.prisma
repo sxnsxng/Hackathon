@@ -33,22 +33,36 @@ model User {
   totalPoint     Int      @default(0)
   createdAt      DateTime @default(now())
   achievements   UserAchievement[]
-  boards EndingBoard[]
 }
 
-// ── GameRecord — บันทึกทุกครั้งที่เล่นจบ ─────────────────────────────────────
+model Achievement {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String
+  icon        String?
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+}
 
 model GameRecord {
   id          Int      @id @default(autoincrement())
   userId      Int
-  endingId    String   // เช่น "new_dawn", "ghost_camp"
-  endingName  String   // เช่น "The New Dawn"
+  endingId    String
+  endingName  String
   isSuccess   Boolean
-  score       Int      // score จาก game นั้น (นำไปบวก totalPoint)
-  roleId      String   // เช่น "food-manager"
+  score       Int
+  roleId      String
   playedAt    DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id])
 }
 
 model GameSessionRecord {
