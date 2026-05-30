@@ -6,6 +6,17 @@ import { ALL_ENDINGS } from "../../endinggallery/data/endings.data"
 import { unlockEnding } from "../../endinggallery/api/endinggalleryapi"
 import bg from "../../../assets/BG.png"
 
+const imageModules = import.meta.glob(
+  "../../../assets/endinggallery/*",
+  { eager: true }
+) as Record<string, { default: string }>
+
+const galleryImages: Record<string, string> = {}
+for (const path in imageModules) {
+  const filename = path.split("/").pop()!
+  galleryImages[filename] = imageModules[path].default
+}
+
 const Result: React.FC = () => {
   const navigate = useNavigate()
   const { stats, score, role, resetGame, addToLifetimeScore } = useGameStore()
@@ -84,16 +95,15 @@ const Result: React.FC = () => {
         <div className="flex flex-col items-center gap-5 px-8 py-6">
 
           {/* Ending image */}
-          <div className="w-full max-w-lg rounded-xl overflow-hidden border border-[#8A8A8A]">
-            <img
-              src={`/src/modules/Gameplay/assets/endings/${ending.imageFile}`}
-              alt={ending.nameEn}
-              className="w-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none"
-              }}
-            />
-          </div>
+          {galleryImages[ending.imageFile] && (
+            <div className="rounded-xl overflow-hidden border border-[#8A8A8A]" style={{ width: 320, height: 220, flexShrink: 0 }}>
+              <img
+                src={galleryImages[ending.imageFile]}
+                alt={ending.nameEn}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </div>
+          )}
 
           {/* Ending name */}
           <p className="text-white font-mono font-bold text-xl tracking-[0.2em] uppercase text-center">
