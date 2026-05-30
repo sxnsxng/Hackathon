@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ALL_ENDINGS, type EndingData } from "../data/endings.data";
 import GalleryCard from "../components/GalleryCard";
 import EndingDetail from "../components/EndingDetail";
-import EndingBoard, { type BoardNode } from "../components/EndingBoard";
+import EndingBoard, { type BoardNode, type BoardEdge } from "../components/EndingBoard";
 import deleteIcon from "../../../assets/DeleteEnding.png";
 import { deleteUnlockedEnding } from "../api/endinggalleryapi";
 import bg from "../../../assets/BG.png";
@@ -18,6 +18,36 @@ for (const path in imageModules) {
   galleryImages[filename] = imageModules[path].default;
 }
 
+// ─── localStorage helpers ─────────────────────────────────────────────────────
+
+interface BoardState {
+  nodes: BoardNode[];
+  edges: BoardEdge[];
+}
+
+const STORAGE_KEY = "endingBoardMap_v2";
+
+function loadBoardMap(): Record<string, BoardState> {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveBoardMap(map: Record<string, BoardState>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+}
+
+// ─── ID generator ─────────────────────────────────────────────────────────────
+
+let _seq = 0;
+function uid() {
+  return `${Date.now()}-${++_seq}`;
+}
+
+// ─── Props ────────────────────────────────────────────────────────────────────
+
 interface EndingGalleryPageProps {
   onClose:      () => void;
   unlockedIds?: string[];
@@ -25,25 +55,31 @@ interface EndingGalleryPageProps {
   onDelete?:    (endingId: string) => void;
 }
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function EndingGalleryPage({
   onClose,
   unlockedIds = [],
   userId,
   onDelete,
 }: EndingGalleryPageProps) {
-  const [selected, setSelected] = useState<EndingData | null>(null);
-  const [boardMap, setBoardMap] = useState<Record<string, BoardNode[]>>(() => {
-    try {
-      return JSON.parse(localStorage.getItem("endingBoardMap") ?? "{}");
-    } catch {
-      return {};
-    }
-  });
+  const [selected, setSelected]   = useState<EndingData | null>(null);
+  const [boardMap, setBoardMap]   = useState<Record<string, BoardState>>(loadBoardMap);
 
-  const saveBoardMap = (next: Record<string, BoardNode[]>) => {
-    setBoardMap(next);
-    localStorage.setItem("endingBoardMap", JSON.stringify(next));
-  };
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  const getBoard = (endingId: string): BoardState =>
+    boardMap[endingId] ?? { nodes: [], edges: [] };
+
+  const updateBoard = useCallback((endingId: string, next: BoardState) => {
+    setBoardMap((prev) => {
+      const updated = { ...prev, [endingId]: next };
+      saveBoardMap(updated);
+      return updated;
+    });
+  }, []);
+
+  // ── Delete ending ──────────────────────────────────────────────────────────
 
   const handleDelete = async () => {
     if (!selected || !userId) return;
@@ -56,19 +92,68 @@ export default function EndingGalleryPage({
     }
   };
 
-  const currentNodes = selected ? (boardMap[selected.id] ?? []) : [];
+  // ── Board handlers (forwarded to EndingBoard) ──────────────────────────────
 
-  const handleAddNode = (label: string) => {
+  const handleAddNode = useCallback((text: string, x: number, y: number) => {
     if (!selected) return;
-    const id = selected.id;
-    saveBoardMap({ ...boardMap, [id]: [...(boardMap[id] ?? []), { id: `n${Date.now()}`, label, createdAt: new Date().toISOString() }] });
-  };
+    const board = getBoard(selected.id);
+    updateBoard(selected.id, {
+      ...board,
+      nodes: [...board.nodes, { id: uid(), text, x, y }],
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, boardMap, updateBoard]);
 
-  const handleDeleteNode = (nodeId: string) => {
+  const handleDeleteNode = useCallback((nodeId: string) => {
     if (!selected) return;
-    const id = selected.id;
-    saveBoardMap({ ...boardMap, [id]: (boardMap[id] ?? []).filter((n: BoardNode) => n.id !== nodeId) });
-  };
+    const board = getBoard(selected.id);
+    updateBoard(selected.id, {
+      nodes: board.nodes.filter((n) => n.id !== nodeId),
+      // Also remove edges connected to this node
+      edges: board.edges.filter(
+        (e) => e.fromNodeId !== nodeId && e.toNodeId !== nodeId
+      ),
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, boardMap, updateBoard]);
+
+  const handleMoveNode = useCallback((nodeId: string, x: number, y: number) => {
+    if (!selected) return;
+    const board = getBoard(selected.id);
+    updateBoard(selected.id, {
+      ...board,
+      nodes: board.nodes.map((n) => (n.id === nodeId ? { ...n, x, y } : n)),
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, boardMap, updateBoard]);
+
+  const handleAddEdge = useCallback((fromNodeId: string, toNodeId: string) => {
+    if (!selected) return;
+    const board = getBoard(selected.id);
+    const exists = board.edges.some(
+      (e) => e.fromNodeId === fromNodeId && e.toNodeId === toNodeId
+    );
+    if (exists) return;
+    updateBoard(selected.id, {
+      ...board,
+      edges: [...board.edges, { id: uid(), fromNodeId, toNodeId }],
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, boardMap, updateBoard]);
+
+  const handleDeleteEdge = useCallback((edgeId: string) => {
+    if (!selected) return;
+    const board = getBoard(selected.id);
+    updateBoard(selected.id, {
+      ...board,
+      edges: board.edges.filter((e) => e.id !== edgeId),
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, boardMap, updateBoard]);
+
+  // ─── Render ───────────────────────────────────────────────────────────────
+
+  const currentBoard = selected ? getBoard(selected.id) : { nodes: [], edges: [] };
 
   return (
     <div
@@ -79,11 +164,9 @@ export default function EndingGalleryPage({
 
         {/* Title bar */}
         <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
-          <div className="flex items-center gap-3">
-            <span className="text-white font-mono text-xl font-bold tracking-wide">
-              {selected ? selected.nameEn.toUpperCase() : "ENDING GALLERY"}
-            </span>
-          </div>
+          <span className="text-white font-mono text-xl font-bold tracking-wide">
+            {selected ? selected.nameEn.toUpperCase() : "ENDING GALLERY"}
+          </span>
           <button
             onClick={onClose}
             className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors pr-4"
@@ -105,15 +188,22 @@ export default function EndingGalleryPage({
               onBack={() => setSelected(null)}
               imageSrc={galleryImages[selected.imageFile]}
             />
+
+            {/* Ending Board section */}
             <div className="border-t border-[#8a8a8a] px-10 py-6">
               <p className="text-white font-mono font-bold text-sm tracking-[0.14em] uppercase mb-4">
                 ENDING BOARD
               </p>
               <EndingBoard
-                nodes={currentNodes}
-                onAdd={handleAddNode}
-                onDelete={handleDeleteNode}
+                nodes={currentBoard.nodes}
+                edges={currentBoard.edges}
+                onAddNode={handleAddNode}
+                onDeleteNode={handleDeleteNode}
+                onMoveNode={handleMoveNode}
+                onAddEdge={handleAddEdge}
+                onDeleteEdge={handleDeleteEdge}
               />
+
               {userId && unlockedIds.includes(selected.id) && (
                 <div className="flex justify-end mt-4">
                   <button
