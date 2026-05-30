@@ -5,8 +5,8 @@ import EndingDetail from "../components/EndingDetail";
 import EndingBoard, { type BoardNode } from "../components/EndingBoard";
 import deleteIcon from "../../../assets/DeleteEnding.png";
 import { deleteUnlockedEnding } from "../api/endinggalleryapi";
+import bg from "../../../assets/BG.png";
 
-// ── image glob (เดิม) ─────────────────────────────────────────────────────────
 const imageModules = import.meta.glob(
   "../../../assets/endinggallery/*",
   { eager: true }
@@ -18,7 +18,6 @@ for (const path in imageModules) {
   galleryImages[filename] = imageModules[path].default;
 }
 
-// ── types ─────────────────────────────────────────────────────────────────────
 interface EndingGalleryPageProps {
   onClose:      () => void;
   unlockedIds?: string[];
@@ -26,7 +25,6 @@ interface EndingGalleryPageProps {
   onDelete?:    (endingId: string) => void;
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function EndingGalleryPage({
   onClose,
   unlockedIds = [],
@@ -34,6 +32,7 @@ export default function EndingGalleryPage({
   onDelete,
 }: EndingGalleryPageProps) {
   const [selected, setSelected] = useState<EndingData | null>(null);
+  const [boardMap, setBoardMap] = useState<Record<string, BoardNode[]>>({});
 
   const handleDelete = async () => {
     if (!selected || !userId) return;
@@ -45,9 +44,6 @@ export default function EndingGalleryPage({
       alert("ลบไม่สำเร็จ กรุณาลองใหม่");
     }
   };
-
-  // Board state follow each ending ID
-  const [boardMap, setBoardMap] = useState<Record<string, BoardNode[]>>({});
 
   const currentNodes = selected ? (boardMap[selected.id] ?? []) : [];
 
@@ -70,98 +66,50 @@ export default function EndingGalleryPage({
   };
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          inset:    0,
-          background: "rgba(0,0,0,0.55)",
-          zIndex:   100,
-        }}
-      />
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      style={{ backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: "center" }}
+    >
+      <div className="relative z-10 w-[75%] h-[90%] bg-[#000000]/85 border border-[#8A8A8A] rounded-xl flex flex-col overflow-hidden shadow-2xl">
 
-      {/* Modal */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          position:        "fixed",
-          top:             "50%",
-          left:            "50%",
-          transform:       "translate(-50%, -50%)",
-          background:      "rgba(16,12,9,0.97)",
-          backdropFilter:  "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          border:          "1px solid rgba(255,255,255,0.1)",
-          borderRadius:    16,
-          width:           900,
-          maxHeight:       "78vh",
-          display:         "flex",
-          flexDirection:   "column",
-          zIndex:          101,
-          overflow:        "hidden",
-        }}
-      >
-        {/* ── Header ── */}
-        <div
-          style={{
-            display:         "flex",
-            alignItems:      "center",
-            justifyContent:  "space-between",
-            padding:         "18px 26px 0",
-            flexShrink:      0,
-          }}
-        >
-          <h2 style={{
-            fontFamily:    "sans-serif",
-            fontSize:      17,
-            fontWeight:    "bold",
-            color:         "#fff",
-            letterSpacing: "0.14em",
-            margin:        0,
-          }}>
-            ENDING GALLERY
-          </h2>
+        {/* Title bar */}
+        <div className="flex items-center justify-between px-8 pt-4 pb-3 border-b border-[#8a8a8a] shrink-0">
+          <div className="flex items-center gap-3">
+            {selected && (
+              <button
+                onClick={() => setSelected(null)}
+                className="text-[#8A8A8A] hover:text-white font-mono text-sm transition-colors"
+              >
+                ← Back
+              </button>
+            )}
+            <span className="text-white font-mono text-xl font-bold tracking-wide">
+              {selected ? selected.nameEn.toUpperCase() : "ENDING GALLERY"}
+            </span>
+          </div>
           <button
             onClick={onClose}
-            style={{
-              background:  "transparent",
-              border:      "none",
-              color:       "rgba(255,255,255,0.4)",
-              fontSize:    24,
-              cursor:      "pointer",
-              lineHeight:  1,
-              padding:     0,
-              transition:  "color 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+            className="text-[#8A8A8A] hover:text-white font-mono text-lg leading-none transition-colors pr-4"
           >
-            ×
+            ✕
           </button>
         </div>
 
-
-{/* ── Content ── */}
+        {/* Content */}
         {selected ? (
-          <div style={{ overflowY: "auto", flex: 1 }}>
+          <div className="flex-1 overflow-y-auto
+            [&::-webkit-scrollbar]:w-1
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-transparent
+            hover:[&::-webkit-scrollbar-thumb]:bg-[#696969]"
+          >
             <EndingDetail
               ending={selected}
               onBack={() => setSelected(null)}
               imageSrc={galleryImages[selected.imageFile]}
             />
-            <div style={{
-              borderTop: "1px solid rgba(255,255,255,0.08)",
-              padding: "20px 46px 26px",
-            }}>
-              <p style={{
-                fontFamily: "sans-serif",
-                fontSize: 20,
-                color: "#ffffff",
-                letterSpacing: "0.14em",
-                marginBottom: 14,
-              }}>
+            <div className="border-t border-[#8a8a8a] px-10 py-6">
+              <p className="text-white font-mono font-bold text-sm tracking-[0.14em] uppercase mb-4">
                 ENDING BOARD
               </p>
               <EndingBoard
@@ -169,21 +117,12 @@ export default function EndingGalleryPage({
                 onAdd={handleAddNode}
                 onDelete={handleDeleteNode}
               />
-
-              {/* ── Delete button ── */}
               {userId && unlockedIds.includes(selected.id) && (
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                <div className="flex justify-end mt-4">
                   <button
                     onClick={handleDelete}
                     title="Delete this ending"
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 4,
-                      opacity: 0.7,
-                      transition: "opacity 0.15s",
-                    }}
+                    style={{ background: "transparent", border: "none", cursor: "pointer", padding: 4, opacity: 0.7, transition: "opacity 0.15s" }}
                     onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                     onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
                   >
@@ -194,25 +133,27 @@ export default function EndingGalleryPage({
             </div>
           </div>
         ) : (
-          <div style={{
-            overflowY:           "auto",
-            padding:             "20px 26px 26px",
-            display:             "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap:                 14,
-          }}>
-            {ALL_ENDINGS.map((ending) => (
-              <GalleryCard
-                key={ending.id}
-                ending={ending}
-                isUnlocked={unlockedIds.includes(ending.id)}
-                onClick={() => setSelected(ending)}
-                imageSrc={galleryImages[ending.imageFile]}
-              />
-            ))}
+          <div className="flex-1 overflow-y-auto px-8 py-6
+            [&::-webkit-scrollbar]:w-1
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-transparent
+            hover:[&::-webkit-scrollbar-thumb]:bg-[#696969]"
+          >
+            <div className="grid grid-cols-3 gap-4">
+              {ALL_ENDINGS.map((ending) => (
+                <GalleryCard
+                  key={ending.id}
+                  ending={ending}
+                  isUnlocked={unlockedIds.includes(ending.id)}
+                  onClick={() => setSelected(ending)}
+                  imageSrc={galleryImages[ending.imageFile]}
+                />
+              ))}
+            </div>
           </div>
         )}
+
       </div>
-    </>
+    </div>
   );
 }
