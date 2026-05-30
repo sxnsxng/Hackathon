@@ -12,15 +12,7 @@ export default function GalleryCard({ ending, isUnlocked, onClick, imageSrc }: G
   const [hovered, setHovered] = useState(false);
 
   if (!isUnlocked) {
-    return (
-      <div
-        style={{
-          background: "rgba(200,200,200,0.15)",
-          borderRadius: 10,
-          aspectRatio: "4/3",
-        }}
-      />
-    );
+    return <div className="bg-white/15 rounded-xl aspect-4/3" />;
   }
 
   return (
@@ -28,21 +20,19 @@ export default function GalleryCard({ ending, isUnlocked, onClick, imageSrc }: G
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="relative rounded-xl aspect-4/3 overflow-hidden cursor-pointer transition-transform duration-150"
       style={{
-        borderRadius: 10,
-        aspectRatio: "4/3",
-        overflow: "hidden",
-        cursor: "pointer",
         transform: hovered ? "scale(1.04)" : "scale(1)",
-        transition: "transform 0.15s ease, box-shadow 0.15s ease",
         boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.6)" : "0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
-      <img
-        src={imageSrc}
-        alt={ending.nameEn}
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-      />
+      <img src={imageSrc} alt={ending.nameEn} className="w-full h-full object-cover block" />
+
+      <div className={`absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/75 to-transparent pt-3 pb-2 px-2.5 transition-opacity duration-150 ${hovered ? "opacity-100" : "opacity-0"}`}>
+        <p className="text-white font-sans text-[11px] font-bold tracking-[0.08em] uppercase text-center m-0">
+          {ending.nameEn}
+        </p>
+      </div>
     </div>
   );
 }

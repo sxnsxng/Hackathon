@@ -27,27 +27,12 @@ function App() {
   }
 
   return (
-    <div style={{
-      position: 'relative',
-      width: '100vw',
-      height: '100vh',
-      backgroundImage: `url(${BG})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      overflow: 'hidden',
-      fontFamily: "'Jura', sans-serif",
-    }}>
-
+    <div
+      className="relative w-screen h-screen bg-cover bg-center overflow-hidden font-jura"
+      style={{ backgroundImage: `url(${BG})` }}
+    >
       {/* Gameplay label — top left */}
-      <div style={{
-        position: 'absolute',
-        top: '16px',
-        left: '20px',
-        color: 'rgba(255,255,255,0.6)',
-        fontSize: '14px',
-        fontFamily: "'Jura', sans-serif",
-        letterSpacing: '2px',
-      }}>
+      <div className="absolute top-4 left-5 text-white/60 text-sm font-jura tracking-[2px]">
         Gameplay
       </div>
 
@@ -55,64 +40,26 @@ function App() {
       <Profile />
 
       {/* Title + Play button — center left */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '8%',
-        transform: 'translateY(-50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '32px',
-      }}>
-        <h1 style={{
-          color: '#fff',
-          fontSize: '4.5vw',
-          fontWeight: 'normal',
-          margin: 0,
-          fontFamily: "'Jura', sans-serif",
-        }}>
+      <div className="absolute top-1/2 left-[8%] -translate-y-1/2 flex flex-col gap-8">
+        <h1 className="font-jura text-white text-[4.5vw] font-normal m-0">
           7 Days to Survive
         </h1>
 
         <div
           onClick={() => navigate('/SelectRole')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            cursor: 'pointer',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+          className="flex items-center gap-3 cursor-pointer hover:opacity-70 transition-opacity"
         >
-          <span style={{ color: '#fff', fontSize: '16px' }}>▶</span>
-          <span style={{
-            color: '#fff',
-            fontFamily: "'Jura', sans-serif",
-            fontSize: '18px',
-            letterSpacing: '1px',
-          }}>
-            Play Game
-          </span>
+          <span className="text-white text-base">▶</span>
+          <span className="font-jura text-white text-lg tracking-[1px]">Play Game</span>
         </div>
       </div>
 
-      {/* Bottom left: achievements + leaderboard icons */}
-      <div style={{
-        position: 'absolute',
-        bottom: '24px',
-        left: '24px',
-        display: 'flex',
-        gap: '20px',
-        alignItems: 'center',
-      }}>
-        {/* Ending Gallery — grid icon */}
+      {/* Bottom left: gallery + leaderboard icons */}
+      <div className="absolute bottom-6 left-6 flex gap-5 items-center">
         <button
           onClick={openGallery}
           title="Ending Gallery"
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, opacity: 0.85 }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.85')}
+          className="bg-transparent border-none cursor-pointer p-0 opacity-85 hover:opacity-100 transition-opacity"
         >
           <svg width="34" height="34" viewBox="0 0 32 32" fill="white">
             <rect x="2" y="2" width="12" height="12" rx="1.5" />
@@ -122,13 +69,10 @@ function App() {
           </svg>
         </button>
 
-        {/* Leaderboard — bar chart icon */}
         <button
           onClick={() => setShowLeaderboard(true)}
           title="Leaderboard"
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, opacity: 0.85 }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.85')}
+          className="bg-transparent border-none cursor-pointer p-0 opacity-85 hover:opacity-100 transition-opacity"
         >
           <svg width="34" height="34" viewBox="0 0 32 32" fill="white">
             <rect x="2" y="20" width="8" height="10" rx="1" />
@@ -143,15 +87,7 @@ function App() {
 
       {/* Leaderboard modal */}
       {showLeaderboard && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 100,
-          backgroundColor: 'rgba(0,0,0,0.6)',
-        }}>
+        <div className="fixed inset-0 flex items-center justify-center z-100 bg-black/60">
           <LeaderBoardPage onClose={() => setShowLeaderboard(false)} />
         </div>
       )}
@@ -165,7 +101,6 @@ function App() {
           onDelete={(id) => setUnlockedIds((prev) => prev.filter((x) => x !== id))}
         />
       )}
-
     </div>
   )
 }

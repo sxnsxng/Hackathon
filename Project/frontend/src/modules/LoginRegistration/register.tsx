@@ -10,7 +10,6 @@ const createSchema = z.object({
 })
 
 const Register: React.FC = () => {
-
     const [email, setEmail] = useState("")
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -19,22 +18,15 @@ const Register: React.FC = () => {
 
     const handleSignUp = async () => {
         const result = createSchema.safeParse({ email, username, password })
-
         if (!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors
-            setErrors({
-                email: fieldErrors.email?.[0],
-                username: fieldErrors.username?.[0],
-                password: fieldErrors.password?.[0],
-            })
+            setErrors({ email: fieldErrors.email?.[0], username: fieldErrors.username?.[0], password: fieldErrors.password?.[0] })
             return
         }
-
         setErrors({})
-
         try {
             await authAPI.register(email, username, password)
-            navigate("/login")
+            navigate("/Login")
         } catch (err: any) {
             const msg: string = err.message || ""
             if (msg.toLowerCase().includes("username")) {
@@ -48,167 +40,57 @@ const Register: React.FC = () => {
     }
 
     return (
-        <div style={{
-            display: "flex",
-            height: "100vh",
-            width: "100vw",
-            overflow: "hidden",
-            backgroundImage: "url('/BG1.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            alignItems: "center",
-            justifyContent: "flex-start",
-        }}>
-            {/* LEFT PANEL */}
-            <div style={{
-            width: "700px",
-            minWidth: "340px",
-            height: "100%",
-            backgroundColor: "transparent",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "0 40px",
-            gap: "24px",
-            }}>
-                <h1 style={{
-                    fontFamily: "'Jura', sans-serif",
-                    color: "#fff",
-                    fontSize: "5vw",
-                    fontWeight: "normal",
-                    margin: "0",    
-                }}>
+        <div
+            className="flex h-screen w-screen overflow-hidden items-center justify-start"
+            style={{ backgroundImage: "url('/BG1.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+        >
+            <div className="w-[700px] min-w-[340px] h-full flex flex-col justify-center px-10 gap-6">
+
+                <h1 className="font-jura text-white text-[5vw] font-normal m-0">
                     7 Days to Survive
                 </h1>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div className="flex flex-col gap-4">
                     <div>
                         <input
-                            style={{
-                                width: "50%",
-                                padding: "12px 16px",
-                                backgroundColor: "transparent",
-                                border: `2px solid ${errors.email ? "#ff6b6b" : "rgba(255, 255, 255, 0.6)"}`,
-                                borderRadius: "15px",
-                                color: "#fff",
-                                outline: "none",
-                                fontSize: "14px",
-                                boxSizing: "border-box",
-                                fontFamily: "'Jura', sans-serif"
-                            }}
+                            className={`w-1/2 px-4 py-3 bg-transparent border-2 ${errors.email ? "border-[#ff6b6b]" : "border-white/60"} rounded-[15px] text-white outline-none text-sm font-jura`}
                             placeholder="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        {errors.email && (
-                            <p style={{
-                                color: "#ff6b6b",
-                                fontSize: "12px",
-                                margin: "6px 0 0 12px",
-                                fontFamily: "'Jura', sans-serif",
-                                letterSpacing: "0.5px",
-                            }}>
-                                ⚠ {errors.email}
-                            </p>
-                        )}
+                        {errors.email && <p className="text-[#ff6b6b] text-xs mt-1.5 ml-3 font-jura">⚠ {errors.email}</p>}
                     </div>
                     <div>
                         <input
-                            style={{
-                                width: "50%",
-                                padding: "12px 16px",
-                                backgroundColor: "transparent",
-                                border: `2px solid ${errors.email ? "#ff6b6b" : "rgba(255, 255, 255, 0.6)"}`,
-                                borderRadius: "15px",
-                                color: "#fff",
-                                outline: "none",
-                                fontSize: "14px",
-                                boxSizing: "border-box",
-                                fontFamily: "'Jura', sans-serif"
-                            }}
+                            className={`w-1/2 px-4 py-3 bg-transparent border-2 ${errors.username ? "border-[#ff6b6b]" : "border-white/60"} rounded-[15px] text-white outline-none text-sm font-jura`}
                             placeholder="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                         />
-                        {errors.username && (
-                            <p style={{
-                                color: "#ff6b6b",
-                                fontSize: "12px",
-                                margin: "6px 0 0 12px",
-                                fontFamily: "'Jura', sans-serif",
-                                letterSpacing: "0.5px",
-                            }}>
-                                ⚠ {errors.username}
-                            </p>
-                        )}
+                        {errors.username && <p className="text-[#ff6b6b] text-xs mt-1.5 ml-3 font-jura">⚠ {errors.username}</p>}
                     </div>
                     <div>
                         <input
-                            style={{
-                                width: "50%",
-                                padding: "12px 16px",
-                                backgroundColor: "transparent",
-                                border: `2px solid ${errors.email ? "#ff6b6b" : "rgba(255, 255, 255, 0.6)"}`,
-                                borderRadius: "15px",
-                                color: "#fff",
-                                outline: "none",
-                                fontSize: "14px",
-                                boxSizing: "border-box",
-                                fontFamily: "'Jura', sans-serif"
-                            }}
+                            className={`w-1/2 px-4 py-3 bg-transparent border-2 ${errors.password ? "border-[#ff6b6b]" : "border-white/60"} rounded-[15px] text-white outline-none text-sm font-jura`}
                             type="password"
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                        {errors.password && (
-                            <p style={{
-                                color: "#ff6b6b",
-                                fontSize: "12px",
-                                margin: "6px 0 0 12px",
-                                fontFamily: "'Jura', sans-serif",
-                                letterSpacing: "0.5px",
-                            }}>
-                                ⚠ {errors.password}
-                            </p>
-                        )}
+                        {errors.password && <p className="text-[#ff6b6b] text-xs mt-1.5 ml-3 font-jura">⚠ {errors.password}</p>}
                     </div>
                 </div>
 
                 <button
                     onClick={handleSignUp}
-                    style={{
-                        width: "50%",
-                        padding: "12px",
-                        backgroundColor: "#fff",
-                        color: "#000",
-                        fontWeight: "bold",
-                        fontSize: "15px",
-                        border: "none",
-                        borderRadius: "15px",
-                        cursor: "pointer",
-                        fontFamily: "'Jura', sans-serif"
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#ccc")}
-                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#fff")}
+                    className="w-1/2 py-3 bg-white text-black font-bold text-[15px] border-0 rounded-[15px] cursor-pointer font-jura hover:bg-[#ccc] transition-colors"
                 >
                     Sign Up
                 </button>
 
-                <div
-                    onClick={() => navigate("/login")}
-                    style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
-                >
-                    <span style={{ color: "#fff", fontSize: "13px" }}>▶</span>
-                    <span style={{
-                        color: "#fff",
-                        fontSize: "13px",
-                        fontWeight: "bold",
-                        letterSpacing: "3px",
-                        fontFamily: "'Jura', sans-serif",
-                    }}>
-                        Already have an account?
-                    </span>
+                <div onClick={() => navigate("/Login")} className="flex items-center gap-2 cursor-pointer">
+                    <span className="text-white text-sm">▶</span>
+                    <span className="text-white text-sm font-bold tracking-[3px] font-jura">Already have an account?</span>
                 </div>
             </div>
         </div>

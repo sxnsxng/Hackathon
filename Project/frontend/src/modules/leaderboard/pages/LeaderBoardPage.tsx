@@ -30,69 +30,29 @@ export default function LeaderBoardPage({ onClose }: Props) {
   }, [])
 
   return (
-    <div
-      style={{
-        background: "rgba(20, 20, 20, 0.80)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderRadius: 14,
-        border: "1px solid rgba(255, 255, 255, 0.08)",
-        width: 380,
-        padding: "32px 28px 28px",
-        position: "relative",
-        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
-      }}
-    >
-      {/* close button */}
+    <div className="relative bg-[rgba(20,20,20,0.80)] backdrop-blur-md rounded-2xl border border-white/10 w-96 px-7 py-8 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+
       {onClose && (
         <button
           onClick={onClose}
-          style={{
-            position: "absolute",
-            top: 18,
-            right: 22,
-            background: "transparent",
-            border: "none",
-            color: "rgba(255, 255, 255, 0.5)",
-            fontSize: "35px",
-            fontWeight: 200,
-            cursor: "pointer",
-            lineHeight: 1,
-            transition: "color 0.2s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.5)")}
+          className="absolute top-4 right-5 bg-transparent border-none text-white/50 text-4xl font-light cursor-pointer leading-none hover:text-white transition-colors"
         >
           ×
         </button>
       )}
 
-      <h2
-        style={{
-          color: "#fff",
-          fontSize: "28px",
-          fontWeight: 300,
-          textAlign: "center",
-          margin: "0 0 16px",
-          fontFamily: "'Segoe UI', Roboto, sans-serif",
-          letterSpacing: "1px",
-        }}
-      >
+      <h2 className="text-white text-3xl font-light text-center mb-4 tracking-wide" style={{ fontFamily: "'Segoe UI', Roboto, sans-serif" }}>
         Top Score
       </h2>
 
-      <hr style={{ border: "none", borderTop: "2px solid rgba(255, 255, 255, 0.4)", marginBottom: 16 }} />
+      <hr className="border-none border-t-2 border-white/40 mb-4" />
 
       {loading ? (
-        <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", fontFamily: "sans-serif" }}>
-          Loading...
-        </p>
+        <p className="text-white/40 text-center font-sans">Loading...</p>
       ) : entries.length === 0 ? (
-        <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", fontFamily: "sans-serif" }}>
-          No scores yet.
-        </p>
+        <p className="text-white/40 text-center font-sans">No scores yet.</p>
       ) : (
-        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+        <ul className="list-none m-0 p-0 flex flex-col gap-1.5">
           {entries.map((entry, i) => (
             <LeaderBoardRow key={entry.id} entry={entry} rank={i + 1} />
           ))}

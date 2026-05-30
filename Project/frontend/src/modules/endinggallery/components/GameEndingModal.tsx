@@ -14,15 +14,7 @@ interface Props {
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-export default function GameEndingModal({
-  ending,
-  score,
-  survived,
-  userId,
-  imageSrc,
-  onClose,
-  onSaved,
-}: Props) {
+export default function GameEndingModal({ ending, score, survived, userId, imageSrc, onClose, onSaved }: Props) {
   const [saveState, setSaveState] = useState<SaveState>("idle");
 
   const handleSave = async () => {
@@ -37,154 +29,61 @@ export default function GameEndingModal({
     }
   };
 
+  const saveBtnClass = saveState === "saved"
+    ? "bg-[rgba(126,207,142,0.15)] border border-[rgba(126,207,142,0.5)] text-[#7ecf8e]"
+    : saveState === "error"
+    ? "bg-[rgba(224,112,112,0.15)] border border-[rgba(224,112,112,0.5)] text-[#e07070]"
+    : "bg-white/90 border-0 text-[#111]";
+
   return (
     <>
       {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{
-          position:   "fixed",
-          inset:      0,
-          background: "rgba(0,0,0,0.65)",
-          zIndex:     200,
-        }}
-      />
+      <div onClick={onClose} className="fixed inset-0 bg-black/65 z-[200]" />
 
       {/* Modal */}
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          position:       "fixed",
-          top:            "50%",
-          left:           "50%",
-          transform:      "translate(-50%, -50%)",
-          width:          540,
-          background:     "rgba(14,11,8,0.97)",
-          backdropFilter: "blur(16px)",
-          border:         "1px solid rgba(255,255,255,0.1)",
-          borderRadius:   14,
-          zIndex:         201,
-          overflow:       "hidden",
-        }}
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[540px] bg-[rgba(14,11,8,0.97)] backdrop-blur-md border border-white/10 rounded-2xl z-[201] overflow-hidden"
       >
-        {/* ── Header ── */}
-        <div style={{
-          display:        "flex",
-          alignItems:     "center",
-          justifyContent: "space-between",
-          padding:        "14px 18px 12px",
-          borderBottom:   "1px solid rgba(255,255,255,0.08)",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <span style={{
-              fontFamily:    "sans-serif",
-              fontWeight:    "bold",
-              fontSize:      13,
-              letterSpacing: "0.08em",
-              color:         survived ? "#7ecf8e" : "#e07070",
-            }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pt-3.5 pb-3 border-b border-white/10">
+          <div className="flex items-center gap-4">
+            <span className={`font-sans font-bold text-[13px] tracking-[0.08em] ${survived ? "text-[#7ecf8e]" : "text-[#e07070]"}`}>
               {survived ? "SUCCESS!! YOU CAN SURVIVE" : "NOT SUCCESS?! YOU CAN'T SURVIVE"}
             </span>
             {survived && (
-              <span style={{
-                fontFamily:    "sans-serif",
-                fontSize:      12,
-                color:         "rgba(255,255,255,0.45)",
-                letterSpacing: "0.06em",
-              }}>
-                SCORE : {score} PT
-              </span>
+              <span className="font-sans text-xs text-white/45 tracking-[0.06em]">SCORE : {score} PT</span>
             )}
           </div>
           <button
             onClick={onClose}
-            style={{
-              background:  "transparent",
-              border:      "none",
-              color:       "rgba(255,255,255,0.4)",
-              fontSize:    22,
-              cursor:      "pointer",
-              lineHeight:  1,
-              padding:     0,
-              transition:  "color 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+            className="bg-transparent border-none text-white/40 text-2xl cursor-pointer leading-none p-0 hover:text-white transition-colors"
           >
             ×
           </button>
         </div>
 
-        {/* ── Image ── */}
-        <div style={{ display: "flex", justifyContent: "center", padding: "20px 18px 0" }}>
-          <img
-            src={imageSrc}
-            alt={ending.nameEn}
-            style={{
-              width:        "100%",
-              maxHeight:    280,
-              objectFit:    "cover",
-              borderRadius: 8,
-              display:      "block",
-            }}
-          />
+        {/* Image */}
+        <div className="flex justify-center px-4 pt-5">
+          <img src={imageSrc} alt={ending.nameEn} className="w-full max-h-[280px] object-cover rounded-lg block" />
         </div>
 
-        {/* ── Name + Description ── */}
-        <div style={{ padding: "18px 24px 8px", textAlign: "center" }}>
-          <h3 style={{
-            fontFamily:    "sans-serif",
-            fontSize:      13,
-            fontWeight:    "bold",
-            color:         "#fff",
-            letterSpacing: "0.14em",
-            margin:        "0 0 12px",
-          }}>
+        {/* Name + Description */}
+        <div className="px-6 pt-4 pb-2 text-center">
+          <h3 className="font-sans text-[13px] font-bold text-white tracking-[0.14em] m-0 mb-3">
             - {ending.nameEn.toUpperCase()} -
           </h3>
-          <p style={{
-            fontFamily:    "sans-serif",
-            fontSize:      11,
-            color:         "rgba(255,255,255,0.65)",
-            lineHeight:    1.85,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-            margin:        0,
-          }}>
+          <p className="font-sans text-[11px] text-white/65 leading-[1.85] uppercase tracking-[0.04em] m-0">
             {ending.description}
           </p>
         </div>
 
-        {/* ── Footer: Save button ── */}
-        <div style={{ display: "flex", justifyContent: "flex-end", padding: "14px 18px 18px" }}>
+        {/* Footer */}
+        <div className="flex justify-end px-4 pb-4 pt-3 gap-2">
           <button
             onClick={handleSave}
             disabled={saveState !== "idle"}
-            style={{
-              background:    saveState === "saved"
-                ? "rgba(126,207,142,0.15)"
-                : saveState === "error"
-                  ? "rgba(224,112,112,0.15)"
-                  : "rgba(255,255,255,0.9)",
-              border:        saveState === "saved"
-                ? "1px solid rgba(126,207,142,0.5)"
-                : saveState === "error"
-                  ? "1px solid rgba(224,112,112,0.5)"
-                  : "none",
-              borderRadius:  8,
-              padding:       "9px 20px",
-              fontFamily:    "sans-serif",
-              fontWeight:    "bold",
-              fontSize:      12,
-              letterSpacing: "0.06em",
-              color:         saveState === "saved"
-                ? "#7ecf8e"
-                : saveState === "error"
-                  ? "#e07070"
-                  : "#111",
-              cursor:        saveState === "idle" ? "pointer" : "default",
-              transition:    "all 0.2s",
-            }}
+            className={`${saveBtnClass} rounded-lg px-5 py-2 font-sans font-bold text-xs tracking-[0.06em] cursor-pointer transition-all duration-200`}
           >
             {saveState === "idle"   && "Save Ending"}
             {saveState === "saving" && "Saving..."}
@@ -194,17 +93,7 @@ export default function GameEndingModal({
           {saveState === "error" && (
             <button
               onClick={() => setSaveState("idle")}
-              style={{
-                marginLeft:  8,
-                background:  "transparent",
-                border:      "1px solid rgba(255,255,255,0.15)",
-                borderRadius: 8,
-                padding:     "9px 14px",
-                fontFamily:  "sans-serif",
-                fontSize:    12,
-                color:       "rgba(255,255,255,0.5)",
-                cursor:      "pointer",
-              }}
+              className="bg-transparent border border-white/15 rounded-lg px-3.5 py-2 font-sans text-xs text-white/50 cursor-pointer"
             >
               Retry
             </button>
