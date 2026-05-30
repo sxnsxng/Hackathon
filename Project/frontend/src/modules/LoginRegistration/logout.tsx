@@ -12,11 +12,11 @@ const Logout: React.FC = () => {
 
     return (
         <>
-            <div onClick={() => setShowLogout(true)} className="absolute bottom-6 right-6 cursor-pointer">
+            <div onClick={() => setShowLogout(true)} className="absolute bottom-10 right-16 cursor-pointer">
                 <img
                     src="/Logout.png"
                     alt="Logout"
-                    className="w-[3vw] h-[3vw]"
+                    className="w-7 h-7"
                     onMouseOver={(e) => (e.currentTarget.src = "/Logout2.png")}
                     onMouseOut={(e) => (e.currentTarget.src = "/Logout.png")}
                 />
