@@ -25,15 +25,15 @@ model GameSession {
 }
 
 model User {
-  id           Int          @id @default(autoincrement())
-  email        String       @unique
-  username     String       @unique
-  password     String       // hashed
-  totalPoint   Int          @default(0)  // บวกทุกครั้งหลังเล่นจบ
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  gameRecords  GameRecord[]
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  username       String   @unique
+  password       String
+  profilePicture String?
+  totalPoint     Int      @default(0)
+  createdAt      DateTime @default(now())
+  achievements   UserAchievement[]
+  boards EndingBoard[]
 }
 
 // ── GameRecord — บันทึกทุกครั้งที่เล่นจบ ─────────────────────────────────────
@@ -61,4 +61,66 @@ model GameSessionRecord {
   morale     Int      @default(65)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model UnlockedEnding {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  endingId   String
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, endingId])
+}
+
+model LeaderboardEntry {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  username   String
+  score      Int
+  role       String
+  dayReached Int
+  ending     String
+  createdAt  DateTime @default(now())
+}
+
+model EndingBoard {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  title String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  nodes BoardNode[]
+  edges BoardEdge[]
+}
+
+model BoardNode {
+  id Int @id @default(autoincrement())
+
+  boardId Int
+
+  text String
+
+  x Float
+  y Float
+
+  createdAt DateTime @default(now())
+
+  board EndingBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+}
+
+model BoardEdge {
+  id Int @id @default(autoincrement())
+
+  boardId Int
+
+  fromNodeId Int
+  toNodeId Int
+
+  board EndingBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }

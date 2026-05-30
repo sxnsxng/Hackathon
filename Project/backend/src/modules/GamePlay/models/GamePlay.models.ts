@@ -5,35 +5,33 @@ import type { SaveEndingInput } from "../schemas/GamePlay.schemas.js"
 
 /**
  * บันทึก game record และบวก score เข้า totalPoint ของ user
- * ทำใน transaction เดียวกันเพื่อความ consistent
  */
 export async function saveEndingAndUpdatePoint(data: SaveEndingInput) {
-  return await prisma.$transaction(async (tx) => {
+  const gameRecord = await prisma.gameRecord.create({
+    data: {
+      userId:     data.userId,
+      endingId:   data.endingId,
+      endingName: data.endingName,
+      isSuccess:  data.isSuccess,
+      score:      data.score,
+      roleId:     data.roleId,
+      playedAt:   data.playedAt ? new Date(data.playedAt) : new Date(),
+    },
+  })
 
-    // 1. สร้าง GameRecord
-    const gameRecord = await tx.gameRecord.create({
-      data: {
-        userId:     data.userId,
-        endingId:   data.endingId,
-        endingName: data.endingName,
-        isSuccess:  data.isSuccess,
-        score:      data.score,
-        roleId:     data.roleId,
-        playedAt:   data.playedAt ? new Date(data.playedAt) : new Date(),
-      },
-    })
-
-    // 2. บวก score เข้า totalPoint ของ user
-    const updatedUser = await tx.user.update({
+  let updatedTotalPoint: number | null = null
+  try {
+    const updatedUser = await prisma.user.update({
       where: { id: data.userId },
-      data: {
-        totalPoint: { increment: data.score },
-      },
+      data: { totalPoint: { increment: data.score } },
       select: { totalPoint: true },
     })
+    updatedTotalPoint = updatedUser.totalPoint
+  } catch {
+    // user ไม่มีใน DB
+  }
 
-    return { gameRecord, updatedTotalPoint: updatedUser.totalPoint }
-  })
+  return { gameRecord, updatedTotalPoint }
 }
 
 /**
@@ -47,7 +45,7 @@ export async function getGameHistoryByUser(userId: number) {
 }
 
 /**
- * ดึง leaderboard — top users by totalPoint
+ * ดึง leaderboard
  */
 export async function getLeaderboard(limit = 10) {
   return await prisma.user.findMany({
@@ -58,5 +56,15 @@ export async function getLeaderboard(limit = 10) {
       username: true,
       totalPoint: true,
     },
+  })
+}
+
+/**
+ * ✅ ลบ Game Session (เมื่อกด ✕ ออกกลางคัน)
+ * โยน error P2025 ถ้า session ไม่มีใน DB
+ */
+export async function deleteGameSession(id: string) {
+  return await prisma.gameSession.delete({
+    where: { id },
   })
 }

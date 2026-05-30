@@ -6,11 +6,11 @@ import {
   saveEndingAndUpdatePoint,
   getGameHistoryByUser,
   getLeaderboard,
+  deleteGameSession,
 } from "../models/GamePlay.models.js"
 
 /**
  * POST /api/gameplay/ending
- * บันทึก ending หลังเล่นจบ + บวก score เข้า totalPoint
  */
 export async function saveEnding(req: Request, res: Response) {
   const parsed = SaveEndingSchema.safeParse(req.body)
@@ -33,7 +33,6 @@ export async function saveEnding(req: Request, res: Response) {
 
 /**
  * GET /api/gameplay/history/:userId
- * ดึง game history ของ user
  */
 export async function getHistory(req: Request, res: Response) {
   const userId = Number(req.params.userId)
@@ -53,7 +52,6 @@ export async function getHistory(req: Request, res: Response) {
 
 /**
  * GET /api/gameplay/leaderboard
- * ดึง top 10 users by totalPoint
  */
 export async function leaderboard(req: Request, res: Response) {
   try {
@@ -62,6 +60,29 @@ export async function leaderboard(req: Request, res: Response) {
     return res.json(data)
   } catch (err) {
     console.error("[leaderboard]", err)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+}
+
+/**
+ * DELETE /api/game/session/:id
+ * ลบ session เมื่อผู้เล่นกด ✕ ออกกลางคัน
+ */
+export async function deleteSession(req: Request, res: Response) {
+  const id = req.params.id as string
+
+  if (!id) {
+    return res.status(400).json({ error: "Session ID is required" })
+  }
+
+  try {
+    await deleteGameSession(id)
+    return res.json({ message: "Session deleted successfully" })
+  } catch (err: any) {
+    if (err?.code === "P2025") {
+      return res.status(404).json({ error: "Session not found" })
+    }
+    console.error("[deleteSession]", err)
     return res.status(500).json({ error: "Internal server error" })
   }
 }
