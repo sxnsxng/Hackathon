@@ -12,12 +12,53 @@ datasource db {
   provider = "sqlite"
 }
 
-model User {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  username       String   @unique
-  password       String
-  profilePicture String?
-  createdAt      DateTime @default(now())
+model GameSession {
+  id         String   @id @default(uuid())
+  role       String   // 'Camp Leader', 'Resource Manager', etc.
+  day        Int      @default(1)
+  supplies   Int      @default(60)
+  safety     Int      @default(50)
+  population Int      @default(70)
+  morale     Int      @default(65)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
 
+model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  username     String       @unique
+  password     String       // hashed
+  totalPoint   Int          @default(0)  // บวกทุกครั้งหลังเล่นจบ
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  gameRecords  GameRecord[]
+}
+
+// ── GameRecord — บันทึกทุกครั้งที่เล่นจบ ─────────────────────────────────────
+
+model GameRecord {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  endingId    String   // เช่น "new_dawn", "ghost_camp"
+  endingName  String   // เช่น "The New Dawn"
+  isSuccess   Boolean
+  score       Int      // score จาก game นั้น (นำไปบวก totalPoint)
+  roleId      String   // เช่น "food-manager"
+  playedAt    DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model GameSessionRecord {
+  id         String   @id @default(uuid())
+  role       String   
+  day        Int      @default(1)
+  supplies   Int      @default(60)
+  safety     Int      @default(50)
+  population Int      @default(70)
+  morale     Int      @default(65)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
