@@ -9,7 +9,7 @@ router.get("/:id", async (req, res) => {
     try {
         const user = await prisma.user.findUnique({ where: { id } })
         if (!user) return res.status(404).json({ success: false, message: "User not found." })
-        return res.json({ success: true, data: { id: user.id, email: user.email, username: user.username, profile: user.profilePicture, createdAt: user.createdAt } })
+        return res.json({ success: true, data: { id: user.id, email: user.email, username: user.username, profile: user.profilePicture, totalPoint: user.totalPoint, createdAt: user.createdAt } })
     } catch (err) {
         return res.status(500).json({ success: false, message: "Internal server error." })
     }

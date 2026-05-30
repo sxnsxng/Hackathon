@@ -1,20 +1,34 @@
-import type { LeaderboardEntry } from "../types/LeaderBoardTypes";
+import { useEffect, useState } from "react";
 import LeaderBoardRow from "../components/LeaderBoardRow";
-
-const MOCK_GLOBAL: LeaderboardEntry[] = [
-  { id: 1, userId: "u1", username: "SurvivorKing", score: 3454, role: "soldier", dayReached: 30, ending: "victory",  createdAt: "2026-05-01" },
-  { id: 2, userId: "u2", username: "DocHero",       score: 2958, role: "doctor",  dayReached: 28, ending: "survived", createdAt: "2026-05-02" },
-  { id: 3, userId: "u3", username: "ChefMaster",    score: 2675, role: "chef",    dayReached: 25, ending: "survived", createdAt: "2026-05-03" },
-  { id: 4, userId: "u4", username: "BraveSoldier",  score: 1020, role: "soldier", dayReached: 22, ending: "dead",     createdAt: "2026-05-04" },
-  { id: 5, userId: "u5", username: "MedicPro",      score:  987, role: "doctor",  dayReached: 20, ending: "dead",     createdAt: "2026-05-05" },
-  { id: 6, userId: "u6", username: "NightWalker",   score:  978, role: "soldier", dayReached: 18, ending: "dead",     createdAt: "2026-05-06" },
-];
+import type { LeaderboardEntry } from "../types/LeaderBoardTypes";
 
 interface Props {
   onClose?: () => void;
 }
 
 export default function LeaderBoardPage({ onClose }: Props) {
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/gameplay/leaderboard?limit=10")
+      .then(r => r.json())
+      .then((data: { id: number; username: string; totalPoint: number }[]) => {
+        setEntries(data.map((u, i) => ({
+          id: i + 1,
+          userId: String(u.id),
+          username: u.username,
+          score: u.totalPoint,
+          role: "-",
+          dayReached: 0,
+          ending: "-",
+          createdAt: "",
+        })))
+      })
+      .catch(() => setEntries([]))
+      .finally(() => setLoading(false))
+  }, [])
+
   return (
     <div
       style={{
@@ -39,7 +53,7 @@ export default function LeaderBoardPage({ onClose }: Props) {
             right: 22,
             background: "transparent",
             border: "none",
-            color: "#fffff",
+            color: "rgba(255, 255, 255, 0.5)",
             fontSize: "35px",
             fontWeight: 200,
             cursor: "pointer",
@@ -53,7 +67,6 @@ export default function LeaderBoardPage({ onClose }: Props) {
         </button>
       )}
 
-      {/*header*/}
       <h2
         style={{
           color: "#fff",
@@ -68,14 +81,23 @@ export default function LeaderBoardPage({ onClose }: Props) {
         Top Score
       </h2>
 
- 
       <hr style={{ border: "none", borderTop: "2px solid rgba(255, 255, 255, 0.4)", marginBottom: 16 }} />
 
-      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-        {MOCK_GLOBAL.map((entry, i) => (
-          <LeaderBoardRow key={entry.id} entry={entry} rank={i + 1} />
-        ))}
-      </ul>
+      {loading ? (
+        <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", fontFamily: "sans-serif" }}>
+          Loading...
+        </p>
+      ) : entries.length === 0 ? (
+        <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", fontFamily: "sans-serif" }}>
+          No scores yet.
+        </p>
+      ) : (
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+          {entries.map((entry, i) => (
+            <LeaderBoardRow key={entry.id} entry={entry} rank={i + 1} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

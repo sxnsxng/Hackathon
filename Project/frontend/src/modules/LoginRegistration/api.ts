@@ -7,6 +7,7 @@ const BASE = "/api"
 const api = axios.create({
     baseURL: BASE,
     headers: { "Content-Type": "application/json" },
+    validateStatus: () => true, // ไม่ throw สำหรับ status ใดๆ
 })
 
 // helper
@@ -17,7 +18,7 @@ async function request<T>(path: string, options?: { method?: string; data?: any;
         data: options?.data,
         params: options?.params,
     })
-    if (!res.data.success) throw new Error(res.data.message)
+    if (!res.data.success) throw new Error(res.data.message ?? "Something went wrong.")
     return res.data.data
 }
 

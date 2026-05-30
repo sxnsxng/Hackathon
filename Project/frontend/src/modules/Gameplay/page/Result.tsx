@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { useGameStore } from "../data/GameStore"
 import { resolveEnding } from "../../endinggallery/types/endingChecker"
 import { ALL_ENDINGS } from "../../endinggallery/data/endings.data"
+import { unlockEnding } from "../../endinggallery/api/endinggalleryapi"
 import bg from "../../../assets/BG.png"
-
-const API = "http://localhost:3000"
 
 const Result: React.FC = () => {
   const navigate = useNavigate()
@@ -25,14 +24,14 @@ const Result: React.FC = () => {
   const endingId  = resolveEnding(gameStats, survived)
   const ending    = ALL_ENDINGS.find((e) => e.id === endingId) ?? ALL_ENDINGS[0]
 
-  const handleSaveEnding = async () => {
+  const handleSaveAndReturn = async () => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}")
     if (!currentUser.id) {
       alert("Please log in to save your ending.")
       return
     }
     try {
-      const res = await fetch(`${API}/api/gameplay/ending`, {
+      const res = await fetch("/api/gameplay/ending", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,10 +45,13 @@ const Result: React.FC = () => {
         }),
       })
       if (!res.ok) throw new Error("Server error")
-      alert("Ending saved!")
+      await unlockEnding(String(currentUser.id), ending.id)
     } catch {
-      alert("Failed to save ending.")
+      // ไม่ block การกลับหน้าแรก แม้ save ไม่สำเร็จ
     }
+    addToLifetimeScore(totalScore)
+    resetGame()
+    navigate("/")
   }
 
   const handleClose = () => {
@@ -124,7 +126,7 @@ const Result: React.FC = () => {
           {/* Save Ending button */}
           <div className="flex justify-end w-full pb-2">
             <button
-              onClick={handleSaveEnding}
+              onClick={handleSaveAndReturn}
               className="font-mono font-bold text-sm tracking-wide px-6 py-2 rounded-xl bg-white text-black hover:-translate-y-0.5 transition-all duration-200"
             >
               Save Ending

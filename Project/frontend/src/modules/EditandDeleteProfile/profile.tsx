@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditProfile from "./editprofile";
 import DeleteAccount from "./deleteaccount";
 import Achievement from "../Achievements/achievement";
@@ -9,7 +9,21 @@ const Profile: React.FC = () => {
     const [showEdit, setShowEdit] = useState(false)
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}")
     const [username, setUsername] = useState(currentUser.username || "")
+    const [totalPoint, setTotalPoint] = useState<number>(currentUser.totalPoint ?? 0)
     const [showDelete, setShowDelete] = useState(false)
+
+    // fetch fresh score ทุกครั้งที่เปิด profile modal
+    useEffect(() => {
+        if (!currentUser.id) return
+        fetch(`/api/users/${currentUser.id}`)
+            .then(r => r.json())
+            .then(res => {
+                if (res.success && res.data.totalPoint != null) {
+                    setTotalPoint(res.data.totalPoint)
+                }
+            })
+            .catch(() => {})
+    }, [currentUser.id])
 
     return (
         <>
@@ -35,7 +49,7 @@ const Profile: React.FC = () => {
                     fontWeight: "bold",
                     fontSize: "16px",
                 }}>
-                    1020 PT.
+                    {totalPoint} PT.
                 </span>
                 <div style={{
                     width: "36px",
@@ -154,7 +168,7 @@ const Profile: React.FC = () => {
                                     fontSize: "16px",
                                     letterSpacing: "2px",
                                 }}>
-                                    1020 PT.
+                                    {totalPoint} PT.
                                 </span>
                             </div>
                         </div>
