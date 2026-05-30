@@ -8,92 +8,27 @@ interface EndingDetailProps {
 
 export default function EndingDetail({ ending, onBack, imageSrc }: EndingDetailProps) {
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 20,
-        padding: "16px 20px 20px",
-        minHeight: 200,
-        alignItems: "flex-start",
-      }}
-    >
-      {/* Pic Ending Card */}
-      <div
-        style={{
-          width: "42%",
-          flexShrink: 0,
-          borderRadius: 10,
-          overflow: "hidden",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
-        }}
-      >
-        <img
-          src={imageSrc}
-          alt={ending.nameEn}
-          style={{ width: "100%", display: "block", objectFit: "cover" }}
-        />
+    <div className="flex gap-5 p-4 min-h-50 items-start">
+      {/* Image */}
+      <div className="w-[42%] shrink-0 rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <img src={imageSrc} alt={ending.nameEn} className="w-full block object-cover" />
       </div>
 
-      {/* Detail pic */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          paddingTop: 4,
-        }}
-      >
-        {/* Back button */}
+      {/* Detail */}
+      <div className="flex-1 flex flex-col relative pt-1">
         <button
           onClick={onBack}
           title="Back to gallery"
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 20,
-            background: "transparent",
-            border: "none",
-            color: "rgba(255,255,255,0.45)",
-            fontSize: 18,
-            cursor: "pointer",
-            lineHeight: 1,
-            padding: 0,
-            transition: "color 0.15s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+          className="absolute top-0 right-5 bg-transparent border-none text-white/45 text-lg cursor-pointer leading-none p-0 hover:text-white transition-colors"
         >
           ↩
         </button>
 
-        {/* ending name */}
-        <h3
-          style={{
-            fontFamily: "sans-serif",
-            fontSize: 15,
-            fontWeight: "bold",
-            color: "#fff",
-            letterSpacing: "0.15em",
-            textAlign: "center",
-            margin: "16px 0 12px",
-          }}
-        >
+        <h3 className="font-sans text-[15px] font-bold text-white tracking-[0.15em] text-center mt-4 mb-3">
           - {ending.nameEn.toUpperCase()} -
         </h3>
 
-        {/* detail ending */}
-        <p
-          style={{
-            fontFamily: "sans-serif",
-            fontSize: 13,
-            color: "rgba(255,255,255,0.7)",
-            lineHeight: 1.9,
-            textAlign: "center",
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
+        <p className="font-sans text-sm text-white/70 leading-[1.9] text-center uppercase tracking-[0.04em]">
           {ending.description}
         </p>
       </div>

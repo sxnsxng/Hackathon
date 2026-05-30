@@ -127,20 +127,24 @@ const Result: React.FC = () => {
                 </span>
               </div>
             ))}
-            <div className="flex flex-col items-center gap-1 border-l border-[#8A8A8A] pl-6">
-              <span className="text-[#8A8A8A] font-mono text-[10px] tracking-widest uppercase">TOTAL SCORE</span>
-              <span className="font-mono font-bold text-lg text-amber-400">{totalScore} PT</span>
-            </div>
-          </div>
+            <div className="flex flex-col items-center gap-1 border-l border-[#8A8A8A] pl-6 min-w-[120px]">
+              <span className="text-[#8A8A8A] font-mono text-[10px] tracking-widest uppercase whitespace-nowrap">
+                TOTAL SCORE
+              </span>
 
-          {/* Save Ending button */}
-          <div className="flex justify-end w-full pb-2">
-            <button
-              onClick={handleSaveAndReturn}
-              className="font-mono font-bold text-sm tracking-wide px-6 py-2 rounded-xl bg-white text-black hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Save Ending
-            </button>
+              <span className="font-mono font-bold text-lg text-amber-400 whitespace-nowrap">
+                {totalScore} PT
+              </span>
+            </div>
+            {/* Save Ending button */}
+            <div className="flex justify-end w-full pb-2">
+              <button
+                onClick={handleSaveAndReturn}
+                className="font-mono font-bold text-sm tracking-wide px-6 py-2 rounded-xl bg-white text-black hover:-translate-y-0.5 transition-all duration-200"
+              >
+                Save Ending
+              </button>
+            </div>
           </div>
         </div>
       </div>

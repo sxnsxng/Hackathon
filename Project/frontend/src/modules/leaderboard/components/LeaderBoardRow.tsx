@@ -7,26 +7,9 @@ interface Props {
 
 function LeaderBoardRow({ entry, rank }: Props) {
   return (
-    <li
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        background: "linear-gradient(90deg, rgba(80, 80, 80, 0.4) 0%, rgba(50, 50, 50, 0.25) 100%)",
-        borderRadius: "0px 6px 6px 0px",
-        padding: "15px 20px",
-        color: "#fffff",
-        fontSize: "16px",
-        fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-        letterSpacing: "0.5px",
-      }}
-    >
-      <span style={{ color: "rgba(255, 255, 255, 0.85)" }}>
-        {rank}. {entry.username}
-      </span>
-      <span style={{ fontWeight: 400, color: "rgba(255, 255, 255, 0.7)" }}>
-        {entry.score.toLocaleString()} pts
-      </span>
+    <li className="flex justify-between items-center bg-linear-to-r from-[rgba(80,80,80,0.4)] to-[rgba(50,50,50,0.25)] rounded-r-md px-4 py-2.5 text-sm tracking-wide" style={{ fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
+      <span className="text-white/85">{rank}. {entry.username}</span>
+      <span className="font-normal text-white/70">{entry.score.toLocaleString()} pts</span>
     </li>
   );
 }
