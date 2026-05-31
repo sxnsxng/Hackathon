@@ -31,16 +31,13 @@ function App() {
       className="relative w-screen h-screen bg-cover bg-center overflow-hidden font-jura"
       style={{ backgroundImage: `url(${BG})` }}
     >
-      {/* Gameplay label — top left */}
-      <div className="absolute top-4 left-5 text-white/60 text-sm font-jura tracking-[2px]">
-        Gameplay
-      </div>
+
 
       {/* Profile + score — top right */}
       <Profile />
 
       {/* Title + Play button — center left */}
-      <div className="absolute top-1/2 left-[8%] -translate-y-1/2 flex flex-col gap-8">
+      <div className="absolute top-2/5 left-[8%] -translate-y-1/2 flex flex-col gap-8">
         <h1 className="font-jura text-white text-[4.5vw] font-normal m-0">
           7 Days to Survive
         </h1>

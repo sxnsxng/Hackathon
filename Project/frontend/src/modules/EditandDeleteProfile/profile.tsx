@@ -50,7 +50,7 @@ const Profile: React.FC = () => {
                         {/* USERNAME */}
                         <div className="flex flex-col gap-2">
                             <span className="font-jura text-white font-bold text-sm tracking-[2px]">USERNAME</span>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 px-5">
                                 <span className="text-white text-sm">▶</span>
                                 <span className="font-jura text-white font-bold text-base tracking-[2px]">{username}</span>
                                 <img src="/EditUser.png" onClick={() => setShowEdit(true)} alt="EditUser"
@@ -64,7 +64,7 @@ const Profile: React.FC = () => {
                         {/* SCORE */}
                         <div className="flex flex-col gap-2">
                             <span className="font-jura text-white font-bold text-sm tracking-[2px]">SCORE</span>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 px-5">
                                 <span className="text-white text-sm">▶</span>
                                 <span className="font-jura text-white font-bold text-base tracking-[2px]">{totalPoint} PT.</span>
                             </div>
