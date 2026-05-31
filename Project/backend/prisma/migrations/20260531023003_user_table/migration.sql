@@ -1,0 +1,29 @@
+-- CreateTable
+CREATE TABLE "EndingBoard" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "userId" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "EndingBoard_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BoardNode" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "boardId" INTEGER NOT NULL,
+    "text" TEXT NOT NULL,
+    "x" REAL NOT NULL,
+    "y" REAL NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "BoardNode_boardId_fkey" FOREIGN KEY ("boardId") REFERENCES "EndingBoard" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BoardEdge" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "boardId" INTEGER NOT NULL,
+    "fromNodeId" INTEGER NOT NULL,
+    "toNodeId" INTEGER NOT NULL,
+    CONSTRAINT "BoardEdge_boardId_fkey" FOREIGN KEY ("boardId") REFERENCES "EndingBoard" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

@@ -53,4 +53,18 @@ router.get('/leaderboard', leaderboard);
 // DELETE /api/game/session/:id
 router.delete('/session/:id', deleteSession);
 
+// GET /api/gameplay/count/:userId
+router.get('/count/:userId', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId as string)
+    const count = await prisma.gameRecord.count({
+      where: { userId }
+    })
+    res.json({ count })
+  } catch (error) {
+    console.error("Error getting game count:", error)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+})
+
 export default router;

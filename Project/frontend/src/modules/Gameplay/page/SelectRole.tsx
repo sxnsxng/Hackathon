@@ -22,7 +22,7 @@ const SelectRole: React.FC = () => {
   const handleConfirm = async () => {
     if (!activeRole) return
     try {
-      const res = await fetch("/api/game/start", {
+      const res = await fetch("/api/gameplay/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: activeRole.id }),
