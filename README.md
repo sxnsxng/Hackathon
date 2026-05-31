@@ -34,12 +34,6 @@
 - Update user by ID (Edit Profile)
 - Delete user by ID
 
-**Ending Board Entries**
-- Get all entries by user ID
-- Create new slot
-- Update entry by ID (save their comments)
-- Delete entry by ID
-
 ---
 
 ## How to Run
