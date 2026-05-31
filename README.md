@@ -50,6 +50,7 @@ cd Hackathon
 cd Backend
 npm install
 npx prisma generate
+npx prisma migrate dev --name "user table"
 npm run dev
 ```
 
