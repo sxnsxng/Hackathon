@@ -37,6 +37,26 @@ function nodeCenter(node: BoardNode) {
   return { cx: node.x + NODE_W / 2, cy: node.y + NODE_H / 2 };
 }
 
+// Returns the point on the border of `node` closest to (tx, ty)
+function nodeBorderPoint(node: BoardNode, tx: number, ty: number) {
+  const cx = node.x + NODE_W / 2;
+  const cy = node.y + NODE_H / 2;
+  const dx = tx - cx;
+  const dy = ty - cy;
+  if (dx === 0 && dy === 0) return { x: cx, y: cy };
+
+  // Half-extents
+  const hw = NODE_W / 2;
+  const hh = NODE_H / 2;
+
+  // Scale factor so the ray hits the rectangle border
+  const scaleX = dx !== 0 ? hw / Math.abs(dx) : Infinity;
+  const scaleY = dy !== 0 ? hh / Math.abs(dy) : Infinity;
+  const scale  = Math.min(scaleX, scaleY);
+
+  return { x: cx + dx * scale, y: cy + dy * scale };
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function EndingBoard({
@@ -236,43 +256,40 @@ export default function EndingBoard({
             const from = nodes.find((n) => n.id === edge.fromNodeId);
             const to   = nodes.find((n) => n.id === edge.toNodeId);
             if (!from || !to) return null;
-            const { cx: x1, cy: y1 } = nodeCenter(from);
-            const { cx: x2, cy: y2 } = nodeCenter(to);
-            const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-            const dx = x2 - x1, dy = y2 - y1;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const curve = Math.min(dist * 0.35, 80);
-            const cpx = mx + (-dy / dist) * curve;
-            const cpy = my + ( dx / dist) * curve;
+            const { cx: fcx, cy: fcy } = nodeCenter(from);
+            const { cx: tcx, cy: tcy } = nodeCenter(to);
+            // Start from border of `from` toward `to`, end at border of `to`
+            const start = nodeBorderPoint(from, tcx, tcy);
+            const end   = nodeBorderPoint(to,   fcx, fcy);
 
             return (
               <g key={edge.id}>
-                <path
-                  d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
-                  stroke="rgba(212,180,118,0.45)" strokeWidth={1.5}
-                  fill="none" markerEnd="url(#eb-arrow)" strokeDasharray="5 4"
+                <line
+                  x1={start.x} y1={start.y} x2={end.x} y2={end.y}
+                  stroke="rgba(212,180,118,0.55)" strokeWidth={1.5}
+                  markerEnd="url(#eb-arrow)"
                 />
-                <path
-                  d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
-                  stroke="transparent" strokeWidth={12} fill="none"
+                <line
+                  x1={start.x} y1={start.y} x2={end.x} y2={end.y}
+                  stroke="transparent" strokeWidth={12}
                   className="pointer-events-auto cursor-pointer"
                   onClick={(ev) => { ev.stopPropagation(); onDeleteEdge(edge.id); }}
                 >
                   <title>Click to remove connection</title>
-                </path>
+                </line>
               </g>
             );
           })}
 
           {/* Temp line */}
           {connectingNode && (() => {
-            const { cx, cy } = nodeCenter(connectingNode);
+            const start = nodeBorderPoint(connectingNode, cursorPos.x, cursorPos.y);
             return (
               <line
                 ref={tempLineRef}
-                x1={cx} y1={cy} x2={cursorPos.x} y2={cursorPos.y}
+                x1={start.x} y1={start.y} x2={cursorPos.x} y2={cursorPos.y}
                 stroke="rgba(212,180,118,0.4)" strokeWidth={1.5}
-                strokeDasharray="6 5" markerEnd="url(#eb-arrow-tmp)"
+                markerEnd="url(#eb-arrow-tmp)"
               />
             );
           })()}
