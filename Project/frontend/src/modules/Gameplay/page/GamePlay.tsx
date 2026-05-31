@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { useGameStore } from "../data/GameStore"
 import { questionsCampLeader } from "../data/Question/questionsCampLeader"
@@ -21,17 +21,37 @@ const Gameplay: React.FC = () => {
   const navigate = useNavigate()
   const { role, day, score, stats, sessionId, applyChoice, nextDay, isGameOver, resetGame } = useGameStore()
   const [chosen, setChosen] = useState<string | null>(null)
+  const isClosingRef = useRef(false)
 
-  // ✅ กรณี refresh หน้า — role หาย → กลับไปเลือก role ใหม่
-  if (!role) {
-    navigate("/SelectRole")
-    return null
-  }
+  // redirect เมื่อ role หาย (refresh) — แต่ไม่ redirect ถ้ากำลัง close อยู่
+  useEffect(() => {
+    if (!role && !isClosingRef.current) {
+      navigate("/SelectRole", { replace: true })
+    }
+  }, [role, navigate])
 
-  if (isGameOver) {
-    navigate("/Result")
-    return null
-  }
+  useEffect(() => {
+    if (isGameOver) {
+      navigate("/Result", { replace: true })
+    }
+  }, [isGameOver, navigate])
+
+  // ลบ session ใน DB เมื่อ refresh หรือปิดหน้าต่าง
+  useEffect(() => {
+    if (!sessionId) return
+
+    const handleBeforeUnload = () => {
+      fetch(`/api/game/session/${sessionId}`, {
+        method: "DELETE",
+        keepalive: true,
+      })
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [sessionId])
+
+  if (!role || isGameOver) return null
 
   const pool = QUESTION_MAP[role.id] ?? []
   const question: Question | undefined = pool.find((q) => q.day === day)
@@ -51,25 +71,19 @@ const Gameplay: React.FC = () => {
     }
   }
 
-  // ✅ DELETE session + จัดการ error ทุกกรณี
   const handleClose = async () => {
+    isClosingRef.current = true
+
     if (sessionId) {
       try {
-        const res = await fetch(`/api/game/session/${sessionId}`, {
-          method: "DELETE",
-        })
-
-        if (!res.ok) {
-          // session ไม่มีใน DB แล้ว (เช่น refresh มาก่อน) → ไม่ต้อง block
-          console.warn("[handleClose] session not found or already deleted")
-        }
+        const res = await fetch(`/api/game/session/${sessionId}`, { method: "DELETE" })
+        if (!res.ok) console.warn("[handleClose] session not found or already deleted")
       } catch (err) {
-        // network error → ไม่ block การออก
         console.error("[handleClose] failed to delete session:", err)
       }
     }
 
-    resetGame()   // ล้าง state ทั้งหมด
+    resetGame()
     navigate("/")
   }
 

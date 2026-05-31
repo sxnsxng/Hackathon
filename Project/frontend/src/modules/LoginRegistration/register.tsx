@@ -44,7 +44,7 @@ const Register: React.FC = () => {
             className="flex h-screen w-screen overflow-hidden items-center justify-start"
             style={{ backgroundImage: "url('/BG1.png')", backgroundSize: "cover", backgroundPosition: "center" }}
         >
-            <div className="w-175 min-w-85 h-full flex flex-col justify-center px-10 gap-6">
+            <div className="w-175 min-w-85 h-full flex flex-col justify-center px-17 gap-6">
 
                 <h1 className="font-jura text-white text-[5vw] font-normal m-0">
                     7 Days to Survive
@@ -88,9 +88,9 @@ const Register: React.FC = () => {
                     Sign Up
                 </button>
 
-                <div onClick={() => navigate("/Login")} className="flex items-center gap-2 cursor-pointer">
-                    <span className="text-white text-sm">▶</span>
-                    <span className="text-white text-sm font-bold tracking-[3px] font-jura">Already have an account?</span>
+                <div onClick={() => navigate("/Login")} className="flex items-center gap-2 cursor-pointer px-1">
+                    <span className="text-white text-l font-bold tracking-[3px] font-normal">Already have an account?</span>
+                    <span className="text-white text-xl font-bold">&#x25BA;</span>
                 </div>
             </div>
         </div>
