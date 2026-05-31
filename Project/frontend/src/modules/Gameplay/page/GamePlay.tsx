@@ -105,33 +105,36 @@ const Gameplay: React.FC = () => {
           [&::-webkit-scrollbar-thumb]:bg-transparent
           hover:[&::-webkit-scrollbar-thumb]:bg-[#696969]"
         >
-          {/* Question */}
-          <div className="border border-[#8A8A8A] rounded-xl px-6 py-5 flex items-center min-h-30">
-            {question ? (
-              <p className="text-white font-mono font-bold text-sm tracking-wide uppercase leading-relaxed">
-                {question.scenario}
-              </p>
-            ) : (
-              <p className="text-[#555] font-mono text-sm italic">No question found for day {day}.</p>
-            )}
-          </div>
+          {/* Question + Status: side-by-side on desktop, stacked on mobile */}
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Question */}
+            <div className="flex-1 border border-[#8A8A8A] rounded-xl px-6 py-5 flex items-center min-h-30">
+              {question ? (
+                <p className="text-white font-mono font-bold text-sm tracking-wide uppercase leading-relaxed">
+                  {question.scenario}
+                </p>
+              ) : (
+                <p className="text-[#555] font-mono text-sm italic">No question found for day {day}.</p>
+              )}
+            </div>
 
-          {/* Status */}
-          <div className="border border-[#8A8A8A] rounded-xl px-4 py-3">
-            <p className="text-white font-mono font-bold text-xs tracking-[0.15em] uppercase mb-3">
-              CURRENT STATUS
-            </p>
-            <div className="grid grid-cols-4 gap-2">
-                {(["supplies", "safety", "population", "morale"] as const).map((key) => (
-                  <div key={key} className="flex flex-col items-center gap-0.5">
-                    <span className="text-[#8A8A8A] font-mono text-[9px] tracking-widest uppercase text-center">
-                      {key === "supplies" ? "FOOD" : key === "population" ? "PEOPLE" : key.toUpperCase()}
-                    </span>
-                    <span className={`font-mono font-bold text-sm tabular-nums ${stats[key] <= 10 ? "text-red-400" : "text-white"}`}>
-                      {stats[key]} <span className="text-[#555] text-[10px]">UNIT</span>
-                    </span>
-                  </div>
-                ))}
+            {/* Status */}
+            <div className="md:w-65 border border-[#8A8A8A] rounded-xl px-4 py-3 shrink-0">
+              <p className="text-white font-mono font-bold text-xs tracking-[0.15em] uppercase mb-3">
+                CURRENT STATUS
+              </p>
+              <div className="grid grid-cols-4 md:grid-cols-2 gap-2">
+                  {(["supplies", "safety", "population", "morale"] as const).map((key) => (
+                    <div key={key} className="flex flex-col items-center gap-0.5">
+                      <span className="text-[#8A8A8A] font-mono text-[9px] tracking-widest uppercase text-center">
+                        {key === "supplies" ? "FOOD" : key === "population" ? "PEOPLE" : key.toUpperCase()}
+                      </span>
+                      <span className={`font-mono font-bold text-sm tabular-nums ${stats[key] <= 10 ? "text-red-400" : "text-white"}`}>
+                        {stats[key]} <span className="text-[#555] text-[10px]">UNIT</span>
+                      </span>
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
 
