@@ -37,6 +37,11 @@ const Result: React.FC = () => {
 
   const handleSaveAndReturn = async () => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}")
+
+    console.log("isSuccess:", ending.isSuccess)
+    console.log("totalScore:", totalScore)
+    console.log("userId:", currentUser.id)
+
     if (!currentUser.id) {
       alert("Please log in to save your ending.")
       return
@@ -57,6 +62,26 @@ const Result: React.FC = () => {
       })
       if (!res.ok) throw new Error("Server error")
       await unlockEnding(String(currentUser.id), ending.id)
+
+      // 🏆 Achievement unlocks
+      const unlock = (id: number) =>
+        fetch(`/api/achievements/${currentUser.id}/${id}`, { method: "POST" }).catch(() => {})
+
+      await unlock(1) // Log In — just in case
+
+      if (ending.isSuccess) {
+          const result = await fetch(`/api/achievements/${currentUser.id}/2`, { method: "POST" })
+          console.log("Win achievement status:", result.status)
+      }
+      if (totalScore >= 1000) await unlock(3) // Score 1000 Points
+
+      // Play 10 Games — check count from backend
+      const gamesRes = await fetch(`/api/gameplay/count/${currentUser.id}`)
+      if (gamesRes.ok) {
+        const { count } = await gamesRes.json()
+        if (count >= 10) await unlock(4) // Play 10 Games
+      }
+
     } catch {
       // ไม่ block การกลับหน้าแรก แม้ save ไม่สำเร็จ
     }
@@ -137,7 +162,7 @@ const Result: React.FC = () => {
             </div>
           </div>
 
-          {/* Save button — แยกออกมาล่างสุด */}
+          {/* Save button */}
           <div className="flex justify-end w-full pb-2 mt-2">
             <button
               onClick={handleSaveAndReturn}
